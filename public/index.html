@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Tiempos de Natación</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700&family=Barlow:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  color-scheme: light dark;
+  --bg: #eef5f7; --surface: #ffffff; --ink: #0c2430; --muted: #4f6b78; --line: #cfe0e6;
+  --accent: #0b7a9b; --accent-ink: #ffffff; --accent-soft: #d9eef4; --danger: #b3321f; --good: #1c7a4a;
+  --rope1: #e2453c; --rope2: #f2c230; --rope3: #1f8fd1;
+  --font-display: "Barlow Condensed", "Arial Narrow", sans-serif;
+  --font-body: "Barlow", system-ui, sans-serif;
+  --font-data: "DM Mono", ui-monospace, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #08171e; --surface: #0f2630; --ink: #e6f2f6; --muted: #8fb0bd; --line: #1e3b47;
+    --accent: #3cc3e3; --accent-ink: #04212b; --accent-soft: #123a47; --danger: #ff8a75; --good: #5fd39a;
+    --rope1: #ef6a60; --rope2: #f5cf5a; --rope3: #4aa9e0;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--ink);
+  font-family: var(--font-body); font-size: 16px; line-height: 1.5;
+  padding: 0 max(16px, env(safe-area-inset-right, 0px)) 48px max(16px, env(safe-area-inset-left, 0px));
+}
+.wrap { max-width: 880px; margin: 0 auto; }
+.rope {
+  height: 10px; margin-inline: -16px;
+  background: repeating-linear-gradient(90deg, var(--rope1) 0 18px, var(--rope2) 18px 36px, var(--rope3) 36px 54px);
+}
+header { padding: 22px 0 14px; display: flex; gap: 12px; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; }
+h1 { font-family: var(--font-display); font-weight: 700; font-size: 2.6rem; line-height: 1; letter-spacing: .01em; margin: 0; text-transform: uppercase; text-wrap: balance; }
+.sub { color: var(--muted); margin: 6px 0 0; max-width: 60ch; }
+nav.tabs { display: flex; gap: 6px; flex-wrap: wrap; margin: 6px 0 20px; border-bottom: 2px solid var(--line); }
+nav.tabs button {
+  font: 600 1.15rem var(--font-display); letter-spacing: .06em; text-transform: uppercase;
+  background: none; border: 0; color: var(--muted); padding: 10px 14px; cursor: pointer;
+  border-bottom: 4px solid transparent; margin-bottom: -2px;
+}
+nav.tabs button[aria-selected="true"] { color: var(--ink); border-bottom-color: var(--accent); }
+nav.tabs button:hover { color: var(--ink); }
+button:focus-visible, input:focus-visible, label:has(input:focus-visible) { outline: 3px solid var(--accent); outline-offset: 2px; }
+section.card { background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 20px; margin-bottom: 18px; min-width: 0; }
+h2 { font-family: var(--font-display); font-weight: 700; font-size: 1.6rem; letter-spacing: .03em; text-transform: uppercase; margin: 0 0 12px; }
+h3 { font-family: var(--font-display); font-weight: 600; font-size: 1.05rem; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 18px 0 8px; }
+label.lbl { display: block; font-weight: 600; margin-bottom: 6px; }
+input[type=text], input[type=password] {
+  width: 100%; font: 500 1.05rem var(--font-body); color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 4px; padding: 10px 12px;
+}
+.events { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.ev { display: flex; align-items: center; gap: 10px; border: 1px solid var(--line); border-radius: 4px; padding: 10px 12px; cursor: pointer; background: var(--bg); font-weight: 500; }
+.ev input { width: 18px; height: 18px; accent-color: var(--accent); margin: 0; }
+.ev:has(input:checked) { background: var(--accent-soft); border-color: var(--accent); }
+.btn { font: 600 1.15rem var(--font-display); letter-spacing: .06em; text-transform: uppercase; background: var(--accent); color: var(--accent-ink); border: 0; border-radius: 4px; padding: 11px 20px; cursor: pointer; }
+.btn:disabled { opacity: .5; cursor: not-allowed; }
+.btn.ghost { background: none; color: var(--accent); border: 1px solid var(--accent); }
+.btn.sm { font-size: .95rem; padding: 5px 10px; }
+.btn.danger { background: none; color: var(--danger); border: 1px solid var(--danger); }
+.row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.msg { margin: 10px 0 0; font-weight: 500; }
+.msg.err { color: var(--danger); }
+.msg.ok { color: var(--good); }
+.note { color: var(--muted); font-size: .95rem; }
+.empty { color: var(--muted); padding: 18px; border: 1px dashed var(--line); border-radius: 6px; text-align: center; }
+ul.list { list-style: none; margin: 0; padding: 0; }
+ul.list li { display: flex; gap: 12px; align-items: flex-start; justify-content: space-between; flex-wrap: wrap; padding: 12px 0; border-top: 1px solid var(--line); }
+ul.list li:first-child { border-top: 0; }
+.who { min-width: 0; flex: 1 1 220px; }
+.who strong { font-size: 1.1rem; overflow-wrap: anywhere; }
+.chips { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.chip { font-family: var(--font-data); font-size: .8rem; background: var(--accent-soft); border-radius: 3px; padding: 2px 7px; }
+.picker { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px; }
+.pick { font: 600 1rem var(--font-body); background: var(--surface); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 8px 12px; cursor: pointer; }
+.pick[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.pick small { font-family: var(--font-data); opacity: .75; margin-left: 4px; }
+.tin { width: 9.5em; font: 500 1.15rem var(--font-data); text-align: right; background: var(--bg); color: var(--ink); border: 1px solid var(--line); border-radius: 4px; padding: 8px 10px; font-variant-numeric: tabular-nums; }
+.tin.bad { border-color: var(--danger); }
+.tin.saved { border-color: var(--good); }
+.pos { font: 700 1.6rem var(--font-display); width: 2.2ch; text-align: center; color: var(--muted); }
+.pos.p1 { color: var(--rope2); } .pos.p2 { color: var(--rope3); } .pos.p3 { color: var(--rope1); }
+.time { font: 500 1.25rem var(--font-data); font-variant-numeric: tabular-nums; }
+.time.none { color: var(--muted); font-size: 1rem; }
+.rank li { align-items: center; flex-wrap: nowrap; }
+.rank .who { flex: 1 1 auto; }
+.evgrid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
+.evgrid section.card { margin: 0; }
+.login { max-width: 420px; }
+.pins { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 14px; }
+.badge { font: 600 .9rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: var(--good); border: 1px solid var(--good); border-radius: 4px; padding: 4px 10px; }
+@media (max-width: 480px) { h1 { font-size: 2.1rem; } section.card { padding: 16px; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="rope" aria-hidden="true"></div>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Tiempos de Natación</h1>
+      <p class="sub">Inscríbete en las pruebas que quieres nadar. El organizador anota el tiempo de cada nadador y aquí se ve la tabla de resultados.</p>
+    </div>
+    <div id="who"></div>
+  </header>
+  <nav class="tabs" id="tabs" role="tablist" aria-label="Secciones"></nav>
+  <main id="view" aria-live="polite"><div class="empty">Cargando inscritos…</div></main>
+</div>
+
+<script>
+(function () {
+  var EVENTS = [
+    { id: "50-libre", name: "50 m libre", stroke: "Libre" },
+    { id: "100-libre", name: "100 m libre", stroke: "Libre" },
+    { id: "200-libre", name: "200 m libre", stroke: "Libre" },
+    { id: "50-espalda", name: "50 m espalda", stroke: "Espalda" },
+    { id: "100-espalda", name: "100 m espalda", stroke: "Espalda" },
+    { id: "50-pecho", name: "50 m pecho", stroke: "Pecho" },
+    { id: "100-pecho", name: "100 m pecho", stroke: "Pecho" },
+    { id: "50-mariposa", name: "50 m mariposa", stroke: "Mariposa" },
+    { id: "100-mariposa", name: "100 m mariposa", stroke: "Mariposa" },
+    { id: "100-combinado", name: "100 m combinado", stroke: "Combinado" }
+  ];
+  var evById = {};
+  EVENTS.forEach(function (e) { evById[e.id] = e; });
+  var STROKES = [];
+  EVENTS.forEach(function (e) { if (STROKES.indexOf(e.stroke) < 0) STROKES.push(e.stroke); });
+
+  function ss(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } }
+  function ssSet(k, v) { try { if (v === null) sessionStorage.removeItem(k); else sessionStorage.setItem(k, v); } catch (e) {} }
+  function ls(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+  function lsSet(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
+
+  var token = ss("swim_token");                      // organizador
+  var me = null;                                     // nadador con sesión: { id, name, token }
+  try { me = JSON.parse(ss("swim_me") || "null"); } catch (e) { me = null; }
+  var ready = false, loadError = false, lastJson = "";
+  var swimmers = [], times = {};
+  var tab = "inscripcion", evSel = EVENTS[0].id;
+  var formName = "", formPin = "", formPin2 = "", formEvents = {}, editingId = null, formMsg = null, confirmDel = null;
+  var pw = "", loginMsg = "", lname = "", lpin = "", miMsg = "", dirty = false;
+
+  function esc(s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function parseTime(s) {
+    s = String(s).trim().replace(",", ".");
+    if (!s) return null;
+    var m = s.match(/^(?:(\d+):)?(\d{1,2})(?:\.(\d{1,2}))?$/);
+    if (!m) return NaN;
+    var min = +(m[1] || 0), sec = +m[2], cs = m[3] ? +(m[3] + "0").slice(0, 2) : 0;
+    if (m[1] && sec >= 60) return NaN;
+    var ms = (min * 60 + sec) * 1000 + cs * 10;
+    return ms > 0 ? ms : NaN;
+  }
+  function fmt(ms) {
+    var t = Math.round(ms / 10), cs = t % 100, s = Math.floor(t / 100) % 60, m = Math.floor(t / 6000);
+    return (m ? m + ":" + String(s).padStart(2, "0") : String(s)) + "." + String(cs).padStart(2, "0");
+  }
+  function evChips(list) {
+    var out = (list || []).filter(function (id) { return evById[id]; }).map(function (id) { return '<span class="chip">' + esc(evById[id].name) + "</span>"; });
+    return out.length ? '<div class="chips">' + out.join("") + "</div>" : "";
+  }
+  function swimmersIn(evId) { return swimmers.filter(function (s) { return (s.events || []).indexOf(evId) >= 0; }); }
+  function timeOf(evId, sid) { var v = times[evId + "__" + sid]; return typeof v === "number" ? v : null; }
+  function ranked(evId) {
+    var list = swimmersIn(evId).map(function (s) { return { s: s, ms: timeOf(evId, s.id) }; });
+    list.sort(function (a, b) {
+      if (a.ms === null && b.ms === null) return (a.s.name || "").localeCompare(b.s.name || "");
+      if (a.ms === null) return 1;
+      if (b.ms === null) return -1;
+      return a.ms - b.ms;
+    });
+    return list;
+  }
+
+  /* ---------- API ---------- */
+  async function api(path, opts) {
+    opts = opts || {};
+    var headers = { "Content-Type": "application/json" };
+    if (token) headers["Authorization"] = "Bearer " + token;
+    if (me && me.token) headers["X-Swimmer-Token"] = me.token;
+    var r = await fetch(path, { method: opts.method || "GET", headers: headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
+    var data = null;
+    try { data = await r.json(); } catch (e) {}
+    if (!r.ok) { var err = new Error((data && data.error) || "Error"); err.status = r.status; throw err; }
+    return data;
+  }
+  function logoutAdmin() { token = null; ssSet("swim_token", null); if (tab === "tiempos") tab = "resultados"; }
+  function logoutMe() { me = null; ssSet("swim_me", null); resetForm(); formMsg = null; }
+  function setMe(v) { me = v; ssSet("swim_me", JSON.stringify(v)); }
+  function handleAuthFail(e) {
+    if (e && e.status === 401 && token) { logoutAdmin(); loginMsg = "La sesión venció. Entra de nuevo."; tab = "organizador"; return true; }
+    if (e && e.status === 403 && me && !token) { logoutMe(); miMsg = "Tu sesión venció. Entra de nuevo con tu nombre y tu PIN."; tab = "mi"; return true; }
+    return false;
+  }
+
+  async function load() {
+    try {
+      var d = await api("/api/data");
+      var j = JSON.stringify(d);
+      loadError = false;
+      if (j !== lastJson || !ready) {
+        lastJson = j;
+        swimmers = d.swimmers;
+        var m = {};
+        d.times.forEach(function (t) { m[t.eventId + "__" + t.swimmerId] = t.ms; });
+        times = m;
+        ready = true;
+        requestRender();
+      }
+    } catch (e) {
+      loadError = true; ready = true; requestRender();
+    }
+  }
+
+  /* ---------- vistas ---------- */
+  function renderTabs() {
+    var tabs = [["inscripcion", "Inscripción"], ["resultados", "Resultados"]];
+    if (!me && !token) tabs.push(["mi", "Mi inscripción"]);
+    tabs.push(token ? ["tiempos", "Tiempos"] : ["organizador", "Organizador"]);
+    document.getElementById("tabs").innerHTML = tabs.map(function (t) {
+      return '<button role="tab" data-act="tab" data-tab="' + t[0] + '" aria-selected="' + (tab === t[0]) + '">' + t[1] + "</button>";
+    }).join("");
+    var who = "";
+    if (token) who = '<span class="badge">Organizador</span> <button class="btn ghost sm" data-act="logout-admin">Salir</button>';
+    else if (me) who = '<span class="badge">' + esc(me.name) + '</span> <button class="btn ghost sm" data-act="logout-me">Salir</button>';
+    document.getElementById("who").innerHTML = who;
+  }
+
+  function pinFieldsHtml(required) {
+    var opt = editingId ? "Nuevo PIN (opcional)" : (required ? "PIN de 4 números" : "PIN del nadador (opcional)");
+    var opt2 = editingId ? "Repite el nuevo PIN" : "Repite el PIN";
+    var note = editingId ? "Déjalo vacío si no quieres cambiar el PIN." : (required ? "Lo vas a necesitar para editar o quitar tu inscripción. Anótalo, no se puede recuperar." : "Si lo dejas vacío, solo tú podrás modificar esta inscripción.");
+    return '<div class="pins"><div><label class="lbl" for="f-pin">' + opt + '</label>' +
+      '<input type="password" id="f-pin" data-field="pin" inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="••••" value="' + esc(formPin) + '"></div>' +
+      '<div><label class="lbl" for="f-pin2">' + opt2 + '</label>' +
+      '<input type="password" id="f-pin2" data-field="pin2" inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="••••" value="' + esc(formPin2) + '"></div></div>' +
+      '<p class="note" style="margin:6px 0 0">' + note + "</p>";
+  }
+
+  function viewForm() {
+    var selCount = Object.keys(formEvents).filter(function (k) { return formEvents[k]; }).length;
+    var h = '<section class="card"><h2>' + (editingId ? "Editar inscripción" : "Inscríbete") + "</h2>";
+    h += '<div><label class="lbl" for="f-name">Nombre del nadador</label>' +
+      '<input type="text" id="f-name" data-field="name" autocomplete="off" maxlength="60" placeholder="Nombre y apellido" value="' + esc(formName) + '"></div>';
+    h += pinFieldsHtml(!token && !editingId);
+    h += "<h3>Pruebas que quieres nadar</h3>";
+    STROKES.forEach(function (st) {
+      h += '<div class="note" style="margin:10px 0 6px;font-weight:600">' + esc(st) + '</div><div class="events">';
+      EVENTS.filter(function (e) { return e.stroke === st; }).forEach(function (e) {
+        h += '<label class="ev"><input type="checkbox" id="e-' + e.id + '" data-ev="' + e.id + '"' + (formEvents[e.id] ? " checked" : "") + ">" + esc(e.name) + "</label>";
+      });
+      h += "</div>";
+    });
+    h += '<div class="row" style="margin-top:18px"><button class="btn" id="f-save" data-act="save">' +
+      (editingId ? "Guardar cambios" : "Inscribirme") + (selCount ? " (" + selCount + (selCount === 1 ? " prueba" : " pruebas") + ")" : "") + "</button>";
+    if (editingId) h += '<button class="btn ghost" data-act="cancel-edit">Cancelar</button>';
+    h += "</div>";
+    if (formMsg) h += '<p class="msg ' + formMsg.kind + '">' + esc(formMsg.text) + "</p>";
+    return h + "</section>";
+  }
+
+  function viewInscripcion() {
+    var h = "";
+    var deviceName = ls("swim_registered");
+    if (editingId) h += viewForm();
+    else if (token || (!me && !deviceName)) h += viewForm();
+    else {
+      h += '<section class="card"><h2>Ya estás inscrito</h2>';
+      if (me) h += '<p>Estás inscrito como <strong>' + esc(me.name) + '</strong>. Para cambiar tus pruebas o quitarte, usa los botones junto a tu nombre en la lista.</p>';
+      else h += '<p>Desde este dispositivo ya se inscribió <strong>' + esc(deviceName) + '</strong>. Si eres tú, entra en <em>Mi inscripción</em> con tu nombre y tu PIN. Si necesitas inscribir a otra persona, pídeselo al organizador.</p>';
+      if (formMsg) h += '<p class="msg ' + formMsg.kind + '">' + esc(formMsg.text) + "</p>";
+      h += "</section>";
+    }
+
+    h += '<section class="card"><h2>Inscritos' + (ready && !loadError ? " (" + swimmers.length + ")" : "") + "</h2>";
+    if (!ready) h += '<div class="empty">Cargando inscritos…</div>';
+    else if (loadError && !swimmers.length) h += '<div class="empty">No se pudo cargar la lista. Revisa tu conexión y vuelve a intentar.</div>';
+    else if (!swimmers.length) h += '<div class="empty">Todavía no hay nadadores. Inscribe el primero con el formulario de arriba.</div>';
+    else {
+      h += '<ul class="list">';
+      swimmers.forEach(function (s) {
+        var can = !!token || (me && me.id === s.id);
+        h += '<li><div class="who"><strong>' + esc(s.name || "Sin nombre") + "</strong>" + evChips(s.events) + "</div>";
+        if (can) {
+          h += '<div class="row"><button class="btn ghost sm" data-act="edit" data-id="' + esc(s.id) + '">Editar</button>';
+          if (confirmDel === s.id) h += '<button class="btn danger sm" data-act="del-yes" data-id="' + esc(s.id) + '">Sí, quitar</button><button class="btn ghost sm" data-act="del-no">No</button>';
+          else h += '<button class="btn danger sm" data-act="del" data-id="' + esc(s.id) + '">Quitar</button>';
+          h += "</div>";
+        }
+        h += "</li>";
+      });
+      h += "</ul>";
+    }
+    return h + "</section>";
+  }
+
+  function viewMi() {
+    return '<section class="card login"><h2>Mi inscripción</h2>' +
+      '<p class="note" style="margin-top:-4px">Entra con el nombre y el PIN que elegiste al inscribirte para cambiar tus pruebas o quitarte de la lista.</p>' +
+      '<form id="mi-form"><label class="lbl" for="f-lname">Nombre</label>' +
+      '<input type="text" id="f-lname" data-field="lname" autocomplete="off" maxlength="60" value="' + esc(lname) + '">' +
+      '<label class="lbl" for="f-lpin" style="margin-top:12px">PIN</label>' +
+      '<input type="password" id="f-lpin" data-field="lpin" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••" value="' + esc(lpin) + '">' +
+      '<div class="row" style="margin-top:14px"><button class="btn" type="submit">Entrar</button></div>' +
+      (miMsg ? '<p class="msg err">' + esc(miMsg) + "</p>" : "") +
+      '<p class="note">Si olvidaste tu PIN, pídele al organizador que te ponga uno nuevo.</p></form></section>';
+  }
+
+  function viewResultados() {
+    if (!ready) return '<div class="empty">Cargando resultados…</div>';
+    var withSwimmers = EVENTS.filter(function (e) { return swimmersIn(e.id).length; });
+    if (!withSwimmers.length) return '<div class="empty">Cuando haya nadadores inscritos, aquí aparece cada prueba con sus tiempos.</div>';
+    var h = '<div class="evgrid">';
+    withSwimmers.forEach(function (e) {
+      var pos = 0;
+      h += '<section class="card"><h2>' + esc(e.name) + '</h2><ul class="list rank">';
+      ranked(e.id).forEach(function (r) {
+        var p;
+        if (r.ms !== null) { pos++; p = '<span class="pos p' + pos + '">' + pos + "</span>"; } else p = '<span class="pos">–</span>';
+        h += "<li>" + p + '<div class="who"><strong>' + esc(r.s.name || "Sin nombre") + "</strong></div>" +
+          (r.ms !== null ? '<span class="time">' + fmt(r.ms) + "</span>" : '<span class="time none">sin tiempo</span>') + "</li>";
+      });
+      h += "</ul></section>";
+    });
+    return h + "</div>";
+  }
+
+  function viewOrganizador() {
+    return '<section class="card login"><h2>Entrar como organizador</h2>' +
+      '<p class="note" style="margin-top:-4px">Con la contraseña puedes anotar y corregir tiempos y modificar cualquier inscripción. Sin ella nadie puede cambiarlos.</p>' +
+      '<form id="login-form"><label class="lbl" for="f-pw">Contraseña</label>' +
+      '<input type="password" id="f-pw" data-field="pw" autocomplete="current-password" value="' + esc(pw) + '">' +
+      '<div class="row" style="margin-top:14px"><button class="btn" type="submit" id="f-login">Entrar</button></div>' +
+      (loginMsg ? '<p class="msg err">' + esc(loginMsg) + "</p>" : "") + "</form></section>";
+  }
+
+  function viewTiempos() {
+    if (!token) return viewOrganizador();
+    if (!ready) return '<div class="empty">Cargando inscritos…</div>';
+    var h = '<div class="picker" role="group" aria-label="Prueba">';
+    EVENTS.forEach(function (e) {
+      h += '<button class="pick" data-act="pick" data-ev="' + e.id + '" aria-pressed="' + (evSel === e.id) + '">' + esc(e.name) + "<small>" + swimmersIn(e.id).length + "</small></button>";
+    });
+    h += "</div>";
+    var ev = evById[evSel], list = ranked(evSel);
+    h += '<section class="card"><h2>' + esc(ev.name) + "</h2>";
+    h += '<p class="note" style="margin-top:-4px">Escribe el tiempo como 32.45 o 1:05.32 y presiona Enter. Para borrar un tiempo, vacía el campo.</p>';
+    if (!list.length) h += '<div class="empty">Nadie se ha inscrito en esta prueba.</div>';
+    else {
+      h += '<ul class="list">';
+      list.forEach(function (r) {
+        h += '<li style="align-items:center"><div class="who"><strong>' + esc(r.s.name || "Sin nombre") + '</strong></div>' +
+          '<input class="tin" type="text" inputmode="decimal" autocomplete="off" id="t-' + esc(r.s.id) + '" data-sid="' + esc(r.s.id) + '" aria-label="Tiempo de ' + esc(r.s.name || "nadador") + '" placeholder="0.00" value="' + (r.ms !== null ? fmt(r.ms) : "") + '"></li>';
+      });
+      h += "</ul>";
+    }
+    h += "</section>";
+    h += '<section class="card"><h2>Exportar</h2><p class="note" style="margin-top:-4px">Descarga todas las pruebas con su clasificación en un archivo CSV que abre Excel.</p>' +
+      '<div class="row"><button class="btn" data-act="csv">Descargar resultados</button></div></section>';
+    return h;
+  }
+
+  function render() {
+    dirty = false;
+    var a = document.activeElement, fid = a && a.id ? a.id : null;
+    renderTabs();
+    var html = tab === "tiempos" ? viewTiempos() : tab === "resultados" ? viewResultados() : tab === "organizador" ? viewOrganizador() : tab === "mi" && !me && !token ? viewMi() : viewInscripcion();
+    document.getElementById("view").innerHTML = html;
+    if (fid) { var el = document.getElementById(fid); if (el && el.focus) el.focus(); }
+  }
+  function isTextInput(a) { return a && a.tagName === "INPUT" && (a.type === "text" || a.type === "password"); }
+  function requestRender() {
+    if (isTextInput(document.activeElement)) { dirty = true; return; }
+    render();
+  }
+
+  /* ---------- acciones ---------- */
+  function resetForm() { formName = ""; formPin = ""; formPin2 = ""; formEvents = {}; editingId = null; }
+
+  function startEdit(id) {
+    var s = swimmers.filter(function (x) { return x.id === id; })[0]; if (!s) return false;
+    editingId = id; formName = s.name || ""; formPin = ""; formPin2 = ""; formEvents = {};
+    (s.events || []).forEach(function (e) { formEvents[e] = true; });
+    formMsg = null; tab = "inscripcion";
+    return true;
+  }
+
+  async function saveSwimmer() {
+    var name = formName.trim();
+    var evs = Object.keys(formEvents).filter(function (k) { return formEvents[k]; });
+    var needPin = !token && !editingId;
+    if (name.length < 2) { formMsg = { kind: "err", text: "Escribe el nombre del nadador." }; render(); return; }
+    if ((needPin || formPin || formPin2) && !/^\d{4}$/.test(formPin)) { formMsg = { kind: "err", text: "El PIN debe tener 4 números." }; render(); return; }
+    if ((needPin || formPin || formPin2) && formPin !== formPin2) { formMsg = { kind: "err", text: "Los dos PIN no coinciden." }; render(); return; }
+    if (!evs.length) { formMsg = { kind: "err", text: "Elige al menos una prueba." }; render(); return; }
+    var btn = document.getElementById("f-save"); if (btn) btn.disabled = true;
+    try {
+      if (editingId) {
+        await api("/api/swimmers?id=" + encodeURIComponent(editingId), { method: "PUT", body: { name: name, events: evs, pin: formPin || undefined } });
+        if (me && me.id === editingId && !token) setMe({ id: me.id, name: name, token: me.token });
+        formMsg = { kind: "ok", text: "Cambios guardados." };
+      } else {
+        var r = await api("/api/swimmers", { method: "POST", body: { name: name, events: evs, pin: formPin || undefined } });
+        if (!token && r.token) { setMe({ id: r.id, name: name, token: r.token }); lsSet("swim_registered", name); }
+        formMsg = { kind: "ok", text: name + " quedó inscrito en " + evs.length + (evs.length === 1 ? " prueba." : " pruebas.") };
+      }
+      resetForm();
+      await load();
+    } catch (e) {
+      if (handleAuthFail(e)) { render(); return; }
+      formMsg = { kind: "err", text: e.status ? e.message : "No se pudo guardar. Intenta de nuevo." };
+    }
+    render();
+  }
+
+  async function removeSwimmer(id) {
+    confirmDel = null;
+    try {
+      await api("/api/swimmers?id=" + encodeURIComponent(id), { method: "DELETE" });
+      if (me && me.id === id && !token) { logoutMe(); lsSet("swim_registered", null); }
+      if (editingId === id) resetForm();
+      formMsg = { kind: "ok", text: "Nadador quitado de la lista." };
+      await load();
+    } catch (e) {
+      if (handleAuthFail(e)) { render(); return; }
+      formMsg = { kind: "err", text: e.status ? e.message : "No se pudo quitar. Intenta de nuevo." };
+    }
+    render();
+  }
+
+  async function saveTime(input) {
+    var sid = input.getAttribute("data-sid"), val = parseTime(input.value);
+    var prev = timeOf(evSel, sid);
+    if (Number.isNaN(val)) { input.classList.add("bad"); input.title = "Formato no válido. Usa 32.45 o 1:05.32"; return; }
+    input.classList.remove("bad"); input.title = "";
+    if (val === prev) return;
+    try {
+      await api("/api/times", { method: "PUT", body: { eventId: evSel, swimmerId: sid, ms: val } });
+      var k = evSel + "__" + sid;
+      if (val === null) delete times[k]; else times[k] = val;
+      if (val !== null) input.value = fmt(val);
+      input.classList.add("saved");
+      setTimeout(function () { input.classList.remove("saved"); }, 1200);
+      lastJson = "";
+    } catch (e) {
+      if (handleAuthFail(e)) { render(); return; }
+      input.classList.add("bad"); input.title = e.message || "No se pudo guardar este tiempo";
+    }
+  }
+
+  async function doLogin() {
+    if (!pw) { loginMsg = "Escribe la contraseña."; render(); return; }
+    try {
+      var r = await api("/api/login", { method: "POST", body: { password: pw } });
+      token = r.token; ssSet("swim_token", token);
+      pw = ""; loginMsg = ""; tab = "tiempos";
+    } catch (e) {
+      loginMsg = e.message || "No se pudo entrar."; pw = "";
+    }
+    render();
+  }
+
+  async function doMiLogin() {
+    if (lname.trim().length < 2 || !/^\d{4}$/.test(lpin)) { miMsg = "Escribe tu nombre y tu PIN de 4 números."; render(); return; }
+    try {
+      var r = await api("/api/swimmer-login", { method: "POST", body: { name: lname.trim(), pin: lpin } });
+      setMe({ id: r.id, name: r.name, token: r.token });
+      lsSet("swim_registered", r.name);
+      lname = ""; lpin = ""; miMsg = "";
+      await load();
+      if (!startEdit(r.id)) tab = "inscripcion";
+    } catch (e) {
+      miMsg = e.message || "No se pudo entrar."; lpin = "";
+    }
+    render();
+    var f = document.getElementById("f-name"); if (f && editingId) f.scrollIntoView({ block: "center" });
+  }
+
+  /* En Excel, un texto que empieza con = + - @ se interpreta como fórmula */
+  function csvText(v) { v = String(v); return /^[=+\-@\t\r]/.test(v) ? "'" + v : v; }
+  function exportCsv() {
+    var q = function (v) { return '"' + String(v).replace(/"/g, '""') + '"'; };
+    var rows = [["Prueba", "Posición", "Nombre", "Tiempo"].map(q).join(",")];
+    EVENTS.forEach(function (e) {
+      var pos = 0;
+      ranked(e.id).forEach(function (r) {
+        var p = ""; if (r.ms !== null) { pos++; p = pos; }
+        rows.push([q(csvText(e.name)), q(p), q(csvText(r.s.name || "")), q(r.ms !== null ? fmt(r.ms) : "")].join(","));
+      });
+    });
+    var blob = new Blob(["﻿" + rows.join("\r\n")], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob); a.download = "resultados-natacion.csv";
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
+  }
+
+  /* ---------- eventos ---------- */
+  document.addEventListener("click", function (ev) {
+    var t = ev.target.closest("[data-act]");
+    if (!t) return;
+    var act = t.getAttribute("data-act"), id = t.getAttribute("data-id");
+    if (act === "tab") { tab = t.getAttribute("data-tab"); loginMsg = ""; miMsg = ""; render(); }
+    else if (act === "save") saveSwimmer();
+    else if (act === "logout-admin") { logoutAdmin(); render(); }
+    else if (act === "logout-me") { logoutMe(); tab = "inscripcion"; render(); }
+    else if (act === "edit") {
+      if (startEdit(id)) { render(); var f = document.getElementById("f-name"); if (f) { f.scrollIntoView({ block: "center" }); f.focus(); } }
+    }
+    else if (act === "cancel-edit") { resetForm(); formMsg = null; render(); }
+    else if (act === "del") { confirmDel = id; render(); }
+    else if (act === "del-no") { confirmDel = null; render(); }
+    else if (act === "del-yes") removeSwimmer(id);
+    else if (act === "pick") { evSel = t.getAttribute("data-ev"); render(); }
+    else if (act === "csv") exportCsv();
+  });
+  document.addEventListener("submit", function (ev) {
+    if (ev.target.id === "login-form") { ev.preventDefault(); doLogin(); }
+    else if (ev.target.id === "mi-form") { ev.preventDefault(); doMiLogin(); }
+  });
+  document.addEventListener("input", function (ev) {
+    var t = ev.target;
+    if (t.getAttribute) {
+      var f = t.getAttribute("data-field");
+      if (f === "pin" || f === "pin2" || f === "lpin") {
+        var c = t.value.replace(/\D/g, "").slice(0, 4);
+        if (c !== t.value) t.value = c;
+      }
+      if (f === "name") formName = t.value;
+      else if (f === "pin") formPin = t.value;
+      else if (f === "pin2") formPin2 = t.value;
+      else if (f === "pw") pw = t.value;
+      else if (f === "lname") lname = t.value;
+      else if (f === "lpin") lpin = t.value;
+    }
+    if (t.classList && t.classList.contains("tin")) { t.classList.remove("bad"); t.title = ""; }
+  });
+  document.addEventListener("change", function (ev) {
+    var t = ev.target;
+    if (t.getAttribute && t.getAttribute("data-ev") && t.type === "checkbox") { formEvents[t.getAttribute("data-ev")] = t.checked; formMsg = null; render(); }
+    else if (t.classList && t.classList.contains("tin")) saveTime(t);
+  });
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key !== "Enter" || !ev.target.classList) return;
+    if (ev.target.classList.contains("tin")) { ev.preventDefault(); ev.target.blur(); }
+    else if (ev.target.id === "f-name" || ev.target.id === "f-pin" || ev.target.id === "f-pin2") { ev.preventDefault(); saveSwimmer(); }
+  });
+  document.addEventListener("focusout", function () {
+    setTimeout(function () { if (dirty && !isTextInput(document.activeElement)) render(); }, 0);
+  });
+
+  /* ---------- arranque: carga y actualización cada 8 s ---------- */
+  render();
+  load();
+  setInterval(function () { if (!document.hidden) load(); }, 8000);
+  document.addEventListener("visibilitychange", function () { if (!document.hidden) load(); });
+})();
+</script>
+</body>
+</html>
