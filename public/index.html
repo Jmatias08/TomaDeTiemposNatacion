@@ -95,6 +95,15 @@ ul.list li:first-child { border-top: 0; }
 .login { max-width: 420px; }
 .pins { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 14px; }
 .badge { font: 600 .9rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: var(--good); border: 1px solid var(--good); border-radius: 4px; padding: 4px 10px; }
+.excel-scroll { overflow: auto; max-height: 360px; margin: 12px 0; }
+.excel-table { border-collapse: collapse; width: 100%; text-align: left; }
+.excel-table th, .excel-table td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+.excel-table th { position: sticky; top: 0; background: var(--surface); }
+.excel-table caption { text-align: left; color: var(--muted); }
+.excel-issues { max-height: 250px; overflow: auto; padding-left: 24px; }
+#excel-file { max-width: 100%; }
+details { margin: 12px 0; }
+summary { cursor: pointer; font-weight: 600; }
 @media (max-width: 480px) { h1 { font-size: 2.1rem; } section.card { padding: 16px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
@@ -113,6 +122,7 @@ ul.list li:first-child { border-top: 0; }
   <main id="view" aria-live="polite"><div class="empty">Cargando inscritos…</div></main>
 </div>
 
+<script src="/excel.js"></script>
 <script>
 (function () {
   var EVENTS = [
@@ -141,7 +151,7 @@ ul.list li:first-child { border-top: 0; }
   var me = null;                                     // nadador con sesión: { id, name, token }
   try { me = JSON.parse(ss("swim_me") || "null"); } catch (e) { me = null; }
   var ready = false, loadError = false, lastJson = "";
-  var swimmers = [], times = {};
+  var swimmers = [], times = {}, timeStatuses = {};
   var tab = "inscripcion", evSel = EVENTS[0].id;
   var formName = "", formPin = "", formPin2 = "", formEvents = {}, editingId = null, formMsg = null, confirmDel = null;
   var pw = "", loginMsg = "", lname = "", lpin = "", miMsg = "", dirty = false;
@@ -194,7 +204,7 @@ ul.list li:first-child { border-top: 0; }
     if (!r.ok) { var err = new Error((data && data.error) || "Error"); err.status = r.status; throw err; }
     return data;
   }
-  function logoutAdmin() { token = null; ssSet("swim_token", null); if (tab === "tiempos") tab = "resultados"; }
+  function logoutAdmin() { token = null; ssSet("swim_token", null); if (window.SwimExcel) SwimExcel.reset(); if (tab === "tiempos") tab = "resultados"; }
   function logoutMe() { me = null; ssSet("swim_me", null); resetForm(); formMsg = null; }
   function setMe(v) { me = v; ssSet("swim_me", JSON.stringify(v)); }
   function handleAuthFail(e) {
@@ -211,8 +221,8 @@ ul.list li:first-child { border-top: 0; }
       if (j !== lastJson || !ready) {
         lastJson = j;
         swimmers = d.swimmers;
-        var m = {};
-        d.times.forEach(function (t) { m[t.eventId + "__" + t.swimmerId] = t.ms; });
+        var m = {}; timeStatuses = {};
+        d.times.forEach(function (t) { m[t.eventId + "__" + t.swimmerId] = t.ms; timeStatuses[t.eventId + "__" + t.swimmerId] = t.status; });
         times = m;
         ready = true;
         requestRender();
@@ -328,7 +338,7 @@ ul.list li:first-child { border-top: 0; }
         var p;
         if (r.ms !== null) { pos++; p = '<span class="pos p' + pos + '">' + pos + "</span>"; } else p = '<span class="pos">–</span>';
         h += "<li>" + p + '<div class="who"><strong>' + esc(r.s.name || "Sin nombre") + "</strong></div>" +
-          (r.ms !== null ? '<span class="time">' + fmt(r.ms) + "</span>" : '<span class="time none">sin tiempo</span>') + "</li>";
+          (r.ms !== null ? '<span class="time">' + fmt(r.ms) + "</span>" : '<span class="time none">' + (timeStatuses[e.id + "__" + r.s.id] === "dns" ? "no nadó" : "sin tiempo") + '</span>') + "</li>";
       });
       h += "</ul></section>";
     });
@@ -347,7 +357,7 @@ ul.list li:first-child { border-top: 0; }
   function viewTiempos() {
     if (!token) return viewOrganizador();
     if (!ready) return '<div class="empty">Cargando inscritos…</div>';
-    var h = '<div class="picker" role="group" aria-label="Prueba">';
+    var h = (window.SwimExcel ? SwimExcel.html() : '') + '<div class="picker" role="group" aria-label="Prueba">';
     EVENTS.forEach(function (e) {
       h += '<button class="pick" data-act="pick" data-ev="' + e.id + '" aria-pressed="' + (evSel === e.id) + '">' + esc(e.name) + "<small>" + swimmersIn(e.id).length + "</small></button>";
     });
@@ -359,7 +369,7 @@ ul.list li:first-child { border-top: 0; }
     else {
       h += '<ul class="list">';
       list.forEach(function (r) {
-        h += '<li style="align-items:center"><div class="who"><strong>' + esc(r.s.name || "Sin nombre") + '</strong></div>' +
+        h += '<li style="align-items:center"><div class="who"><strong>' + esc(r.s.name || "Sin nombre") + '</strong>' + (timeStatuses[evSel + "__" + r.s.id] === "dns" ? '<small class="note"> · no nadó</small>' : '') + '</div>' +
           '<input class="tin" type="text" inputmode="decimal" autocomplete="off" id="t-' + esc(r.s.id) + '" data-sid="' + esc(r.s.id) + '" aria-label="Tiempo de ' + esc(r.s.name || "nadador") + '" placeholder="0.00" value="' + (r.ms !== null ? fmt(r.ms) : "") + '"></li>';
       });
       h += "</ul>";
@@ -443,11 +453,11 @@ ul.list li:first-child { border-top: 0; }
     var prev = timeOf(evSel, sid);
     if (Number.isNaN(val)) { input.classList.add("bad"); input.title = "Formato no válido. Usa 32.45 o 1:05.32"; return; }
     input.classList.remove("bad"); input.title = "";
-    if (val === prev) return;
+    if (val === prev && timeStatuses[evSel + "__" + sid] !== "dns") return;
     try {
       await api("/api/times", { method: "PUT", body: { eventId: evSel, swimmerId: sid, ms: val } });
       var k = evSel + "__" + sid;
-      if (val === null) delete times[k]; else times[k] = val;
+      if (val === null) { delete times[k]; delete timeStatuses[k]; } else { times[k] = val; timeStatuses[k] = "ok"; }
       if (val !== null) input.value = fmt(val);
       input.classList.add("saved");
       setTimeout(function () { input.classList.remove("saved"); }, 1200);
@@ -495,7 +505,7 @@ ul.list li:first-child { border-top: 0; }
       var pos = 0;
       ranked(e.id).forEach(function (r) {
         var p = ""; if (r.ms !== null) { pos++; p = pos; }
-        rows.push([q(csvText(e.name)), q(p), q(csvText(r.s.name || "")), q(r.ms !== null ? fmt(r.ms) : "")].join(","));
+        rows.push([q(csvText(e.name)), q(p), q(csvText(r.s.name || "")), q(r.ms !== null ? fmt(r.ms) : timeStatuses[e.id + "__" + r.s.id] === "dns" ? "No nadó" : "")].join(","));
       });
     });
     var blob = new Blob(["﻿" + rows.join("\r\n")], { type: "text/csv;charset=utf-8" });
@@ -560,6 +570,7 @@ ul.list li:first-child { border-top: 0; }
   });
 
   /* ---------- arranque: carga y actualización cada 8 s ---------- */
+  if (window.SwimExcel) SwimExcel.init({ token: function () { return token; }, api: api, auth: handleAuthFail, render: requestRender, load: load });
   render();
   load();
   setInterval(function () { if (!document.hidden) load(); }, 8000);

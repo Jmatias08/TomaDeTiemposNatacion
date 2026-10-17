@@ -1,3 +1,4 @@
 {
-  "outputDirectory": "public"
+  "outputDirectory": "public",
+  "functions": { "api/excel.js": { "maxDuration": 60 } }
 }

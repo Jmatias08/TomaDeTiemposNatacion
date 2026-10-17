@@ -29,6 +29,7 @@ async function getDb() {
   await global._swimIndexes;
   return db;
 }
+async function getClient() { await getDb(); return clientPromise; }
 
 /* ---------- Sesión de organizador (token firmado, 12 h) ---------- */
 function secret() {
@@ -117,6 +118,6 @@ function handler(fn) {
 }
 
 module.exports = {
-  EVENTS, getDb, makeToken, isAdmin, safeEqual, send, cleanName, nameKey, cleanEvents, handler,
+  EVENTS, getDb, getClient, makeToken, isAdmin, safeEqual, send, cleanName, nameKey, cleanEvents, handler,
   makeSwimmerToken, swimmerIdFromReq, hashPin, verifyPin, cleanPin
 };

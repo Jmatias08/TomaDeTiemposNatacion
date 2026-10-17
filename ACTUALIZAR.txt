@@ -1,0 +1,39 @@
+ACTUALIZAR TU WEB
+
+1. Extrae el ZIP.
+2. Copia el contenido de natacion-vercel a tu carpeta del proyecto o al mismo repositorio de GitHub que ya usa Vercel.
+3. Incluye TODOS los archivos nuevos y modificados. No subas la carpeta contenedora como una subcarpeta si antes api y public estaban en la raíz.
+4. Publica los cambios en GitHub y espera el despliegue automático de Vercel.
+5. Conserva tus variables de Vercel. MONGODB_DB debe seguir siendo TomaDeTiempos. No borres datos de MongoDB.
+6. Entra como organizador, abre Tiempos y busca Tiempos desde Excel.
+
+ARCHIVOS NUEVOS
+api/_excel.js
+api/excel.js
+public/excel.js
+test/excel.test.js
+test/helpers.js
+ACTUALIZAR.txt
+
+ARCHIVOS MODIFICADOS
+api/_lib.js
+api/data.js
+api/times.js
+public/index.html
+package.json
+package-lock.json
+vercel.json
+README.md
+.env.example (solo ejemplo, no reemplaza las variables de Vercel)
+
+USO
+Descargar Excel por series → llenar tiempos → guardar como .xlsx → seleccionar archivo → revisar → confirmar y publicar.
+Hay una pestaña por prueba y cuatro nadadores por serie. Puedes imprimir las hojas.
+Tiempo vacío conserva el resultado. Para borrar, vacía Tiempo y elige BORRAR en Acción. Para una ausencia, vacía Tiempo y elige NO NADÓ.
+Puedes subir avances parciales y repetir archivos sin duplicar tiempos. Los errores bloquean el lote completo.
+Conserva el mismo archivo durante la jornada. Una nueva descarga usa la lista actual y puede redistribuir las series.
+
+EDICIONES DIRECTAS CON CODEX
+Abre en Codex la carpeta del proyecto que utilizas para subir a GitHub y continúa la conversación dentro de esa carpeta. Así se editan los archivos de trabajo directamente.
+Si lo único que tienes es el ZIP, puedes extraer este proyecto y usar esa carpeta como tu carpeta de trabajo.
+Editar archivos locales no publica automáticamente en Vercel: los cambios deben llegar al repositorio conectado.

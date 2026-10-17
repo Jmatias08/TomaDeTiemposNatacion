@@ -10,6 +10,6 @@ module.exports = handler(async (req, res) => {
   // solo campos públicos: nunca el PIN ni datos internos
   send(res, 200, {
     swimmers: swimmers.map((s) => ({ id: String(s._id), name: s.name, events: s.events || [], createdAt: s.createdAt })),
-    times: times.map((t) => ({ eventId: t.eventId, swimmerId: t.swimmerId, ms: t.ms }))
+    times: times.map((t) => ({ eventId: t.eventId, swimmerId: t.swimmerId, ms: t.ms, status: t.status === "dns" ? "dns" : "ok" }))
   });
 });

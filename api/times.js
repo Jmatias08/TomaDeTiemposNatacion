@@ -19,6 +19,6 @@ module.exports = handler(async (req, res) => {
     return send(res, 200, { ok: true });
   }
   if (!Number.isInteger(ms) || ms <= 0 || ms >= 3600000) return send(res, 400, { error: "Tiempo no válido" });
-  await db.collection("times").updateOne(filter, { $set: { ms, updatedAt: Date.now() } }, { upsert: true });
+  await db.collection("times").updateOne(filter, { $set: { ms, status: "ok", updatedAt: Date.now() } }, { upsert: true });
   send(res, 200, { ok: true });
 });
