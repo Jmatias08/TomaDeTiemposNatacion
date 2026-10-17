@@ -237,9 +237,9 @@ ul.list li:first-child { border-top: 0; }
   }
 
   function pinFieldsHtml(required) {
-    var opt = editingId ? "Nuevo PIN (opcional)" : (required ? "PIN de 4 números" : "PIN del nadador (opcional)");
-    var opt2 = editingId ? "Repite el nuevo PIN" : "Repite el PIN";
-    var note = editingId ? "Déjalo vacío si no quieres cambiar el PIN." : (required ? "Lo vas a necesitar para editar o quitar tu inscripción. Anótalo, no se puede recuperar." : "Si lo dejas vacío, solo tú podrás modificar esta inscripción.");
+    var opt = required ? "PIN de 4 números" : "PIN del nadador (opcional)";
+    var opt2 = "Repite el PIN";
+    var note = required ? "Lo vas a necesitar para editar o quitar tu inscripción. Anótalo, no se puede recuperar." : "Si lo dejas vacío, solo tú podrás modificar esta inscripción.";
     return '<div class="pins"><div><label class="lbl" for="f-pin">' + opt + '</label>' +
       '<input type="password" id="f-pin" data-field="pin" inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="••••" value="' + esc(formPin) + '"></div>' +
       '<div><label class="lbl" for="f-pin2">' + opt2 + '</label>' +
@@ -252,7 +252,7 @@ ul.list li:first-child { border-top: 0; }
     var h = '<section class="card"><h2>' + (editingId ? "Editar inscripción" : "Inscríbete") + "</h2>";
     h += '<div><label class="lbl" for="f-name">Nombre del nadador</label>' +
       '<input type="text" id="f-name" data-field="name" autocomplete="off" maxlength="60" placeholder="Nombre y apellido" value="' + esc(formName) + '"></div>';
-    h += pinFieldsHtml(!token && !editingId);
+    if (!editingId) h += pinFieldsHtml(!token);
     h += "<h3>Pruebas que quieres nadar</h3>";
     STROKES.forEach(function (st) {
       h += '<div class="note" style="margin:10px 0 6px;font-weight:600">' + esc(st) + '</div><div class="events">';
@@ -406,7 +406,7 @@ ul.list li:first-child { border-top: 0; }
     var btn = document.getElementById("f-save"); if (btn) btn.disabled = true;
     try {
       if (editingId) {
-        await api("/api/swimmers?id=" + encodeURIComponent(editingId), { method: "PUT", body: { name: name, events: evs, pin: formPin || undefined } });
+        await api("/api/swimmers?id=" + encodeURIComponent(editingId), { method: "PUT", body: { name: name, events: evs } });
         if (me && me.id === editingId && !token) setMe({ id: me.id, name: name, token: me.token });
         formMsg = { kind: "ok", text: "Cambios guardados." };
       } else {

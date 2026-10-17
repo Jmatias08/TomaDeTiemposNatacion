@@ -63,7 +63,8 @@ module.exports = handler(async (req, res) => {
     const events = cleanEvents(body.events);
     if (!name) return send(res, 400, { error: "Escribe el nombre del nadador (2 a 60 letras)." });
     if (!events) return send(res, 400, { error: "Elige al menos una prueba." });
-    const pin = await pinFields(body.pin);
+    // el PIN no se cambia al editar: solo el organizador puede ponerle uno nuevo a alguien
+    const pin = admin ? await pinFields(body.pin) : { fields: {} };
     if (pin.error) return send(res, 400, { error: pin.error });
     const key = nameKey(name);
     const other = await col.findOne({ nameKey: key });
