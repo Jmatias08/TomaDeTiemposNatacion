@@ -125,15 +125,16 @@ summary { cursor: pointer; font-weight: 600; }
 <script>
 (function () {
   var EVENTS = [
+    { id: "25-libre", name: "25 m libre", stroke: "Libre" },
     { id: "50-libre", name: "50 m libre", stroke: "Libre" },
     { id: "100-libre", name: "100 m libre", stroke: "Libre" },
-    { id: "200-libre", name: "200 m libre", stroke: "Libre" },
-    { id: "50-espalda", name: "50 m espalda", stroke: "Espalda" },
-    { id: "100-espalda", name: "100 m espalda", stroke: "Espalda" },
-    { id: "50-pecho", name: "50 m pecho", stroke: "Pecho" },
-    { id: "100-pecho", name: "100 m pecho", stroke: "Pecho" },
+    { id: "400-libre", name: "400 m libre", stroke: "Libre" },
+    { id: "25-mariposa", name: "25 m mariposa", stroke: "Mariposa" },
     { id: "50-mariposa", name: "50 m mariposa", stroke: "Mariposa" },
-    { id: "100-mariposa", name: "100 m mariposa", stroke: "Mariposa" },
+    { id: "25-espalda", name: "25 m dorso", stroke: "Dorso" },
+    { id: "50-espalda", name: "50 m dorso", stroke: "Dorso" },
+    { id: "25-pecho", name: "25 m pecho", stroke: "Pecho" },
+    { id: "50-pecho", name: "50 m pecho", stroke: "Pecho" },
     { id: "100-combinado", name: "100 m combinado", stroke: "Combinado" }
   ];
   var evById = {};
@@ -368,7 +369,7 @@ summary { cursor: pointer; font-weight: 600; }
     if (!token) return false;
     var s = swimmers.filter(function (x) { return x.id === id; })[0]; if (!s) return false;
     editingId = id; formName = s.name || ""; formEvents = {};
-    (s.events || []).forEach(function (e) { formEvents[e] = true; });
+    (s.events || []).forEach(function (e) { if (evById[e]) formEvents[e] = true; });
     formMsg = null; tab = "inscripcion";
     return true;
   }

@@ -1,5 +1,9 @@
 ACTUALIZAR TU WEB
 
+PRUEBAS ACTUALES (11)
+25, 50, 100 y 400 m libre; 25 y 50 m mariposa; 25 y 50 m dorso; 25 y 50 m pecho; 100 m combinado.
+Después de publicar este cambio, descarga un Excel nuevo. Los archivos de las pruebas anteriores pueden incluir hojas que ya no están disponibles.
+
 CAMBIO ACTUAL: SOLO EL ORGANIZADOR CORRIGE INSCRIPCIONES
 Los nadadores se inscriben con nombre y pruebas. Se quitaron los campos de clave, la pestaña de acceso personal y la ruta api/swimmer-login.js.
 Si alguien se equivoca, la página le indica que se comunique con el organizador.

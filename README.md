@@ -4,6 +4,8 @@ Web para inscribir nadadores por prueba y anotar tiempos. Hecha para Vercel con 
 
 ## Cómo funciona
 
+Pruebas disponibles: **25, 50, 100 y 400 m libre; 25 y 50 m mariposa; 25 y 50 m dorso; 25 y 50 m pecho; 100 m combinado** (11 pruebas).
+
 - **Inscribirse:** cada persona escribe su nombre y marca sus pruebas. No necesita cuenta ni clave.
 - **Un nombre, una inscripción:** el mismo nombre no se puede inscribir dos veces (no importan mayúsculas ni tildes). Además, desde un mismo dispositivo solo se puede inscribir una persona.
 - **Corregir o quitar una inscripción:** solo el organizador puede hacerlo. Si alguien se equivoca, debe comunicarse con él. La página muestra ese aviso al inscribirse y si intenta repetir un nombre.
@@ -54,7 +56,7 @@ Si cambias una variable después, hay que volver a desplegar (Deployments → �
 ## Excel por series (nuevo)
 
 1. Entra a **Organizador → Tiempos → Descargar Excel por series**.
-2. Recibirás un solo archivo `.xlsx`, con una pestaña para cada una de las diez pruebas. Los inscritos se ordenan por fecha de inscripción y se reparten en series de cuatro, carriles 1 a 4. El último grupo puede tener menos de cuatro nadadores. No hay siembra por tiempos, categoría ni sexo.
+2. Recibirás un solo archivo `.xlsx`, con una pestaña para cada una de las once pruebas. Los inscritos se ordenan por fecha de inscripción y se reparten en series de cuatro, carriles 1 a 4. El último grupo puede tener menos de cuatro nadadores. No hay siembra por tiempos, categoría ni sexo.
 3. Puedes ajustar **Serie** y **Carril** dentro del archivo antes de imprimirlo o usarlo. No asignes dos nadadores al mismo carril de la misma serie. Las series son una organización del archivo; no cambian las inscripciones en la web.
 4. Llena **Tiempo** como texto: `32.45`, `32,45` o `1:05.32`. Las celdas ya tienen formato Texto. No uses fórmulas, fechas ni formatos compactos como `3245`. El archivo incluye los tiempos que ya existen para que puedas corregirlos.
 5. Dejar Tiempo y Acción vacíos **conserva el resultado existente**. Para borrar, vacía Tiempo y escribe `BORRAR` en Acción. Para registrar una ausencia, vacía Tiempo y elige `NO NADÓ`. Ese estado aparece en Resultados y en el CSV.
@@ -68,7 +70,7 @@ Si cambias una variable después, hay que volver a desplegar (Deployments → �
 - Una copia vieja no sobrescribe silenciosamente resultados que cambiaron después de descargarla. Las filas intactas se omiten y los conflictos se muestran como errores. Para una nueva corrección después de publicar, descarga un Excel actualizado. El mismo archivo sigue sirviendo para cargar las filas que aún están pendientes.
 - Las filas duplicadas, carriles repetidos, formatos inválidos y tiempos para nadadores retirados o pruebas que ya no nadan bloquean todo el lote. Nadadores nuevos que no aparecen generan un aviso y sus datos se conservan.
 - Puedes cargar solo algunas pestañas si conservan su estructura original. No agregues columnas, encabezados, hojas de notas ni filas manuales. Para incluir un nuevo nadador, inscríbelo en la web y descarga otro archivo.
-- Se permiten archivos de hasta **2 MB**, diez hojas y 1.000 filas de nadadores por hoja. Los archivos cifrados, macros, vínculos externos, objetos incrustados y contenidos descomprimidos excesivos se rechazan.
+- Se permiten archivos de hasta **2 MB**, once hojas y 1.000 filas de nadadores por hoja. Los archivos cifrados, macros, vínculos externos, objetos incrustados y contenidos descomprimidos excesivos se rechazan.
 - Las revisiones vencen a los **15 minutos** y se comprueban nuevamente al confirmar. El servidor usa una transacción de MongoDB para que un error no deje la mitad del lote guardada. Esto requiere MongoDB Atlas o un replica set, no un MongoDB local independiente.
 - Si pierdes conexión al confirmar, el resultado puede haberse guardado. Vuelve a revisar el mismo archivo: los datos ya aplicados se omiten y no se duplican.
 - Los archivos están vinculados al secreto de este despliegue. Si cambias `SESSION_SECRET` (o la contraseña cuando se usa como secreto), descarga archivos nuevos.
@@ -76,6 +78,8 @@ Si cambias una variable después, hay que volver a desplegar (Deployments → �
 ### Mantener las series durante el evento
 
 Descarga cuando la lista esté lista y conserva el mismo archivo durante la jornada. Una nueva descarga se genera con la lista actual: si alguien se retira o se inscribe, las series pueden cambiar. Esta versión no cierra automáticamente las inscripciones ni almacena series en la base. Coordina el cierre con los participantes y revisa los avisos si trabajas con una lista anterior.
+
+Después del cambio a las once pruebas, descarga un Excel nuevo. Las antiguas pruebas de 200 libre y 100 espalda, pecho y mariposa ya no se ofrecen ni se reasignan automáticamente a otras distancias. Los datos existentes permanecen en la base, pero no se muestran en las pruebas actuales; al editar una inscripción solo se seleccionan pruebas vigentes. Dorso conserva los identificadores internos `25-espalda` y `50-espalda`; el nombre visible es dorso.
 
 ## Actualizar una web ya desplegada
 
@@ -87,7 +91,7 @@ Después del despliegue haz primero una prueba con una inscripción de prueba: d
 
 ## Verificación del cambio
 
-`npm install` y `npm test` ejecutan las pruebas automatizadas de inscripción, permisos de organizador, generación, lectura e importación de Excel. Las pruebas usan una base simulada para validar los contratos y las rutas; no sustituyen una prueba contra tu Atlas real. La función de Excel se verificó también en navegador con datos ficticios y generando/leyendo 10.000 filas (1.000 inscritos en diez pruebas). No se validó el guardado desde una instalación real de Microsoft Excel.
+`npm install` y `npm test` ejecutan las pruebas automatizadas de inscripción, permisos de organizador, generación, lectura e importación de Excel. Las pruebas usan una base simulada para validar los contratos y las rutas; no sustituyen una prueba contra tu Atlas real. La función de Excel se verificó también en navegador con datos ficticios y generando/leyendo 11.000 filas (1.000 inscritos en once pruebas). No se validó el guardado desde una instalación real de Microsoft Excel.
 
 ## Probar en tu computadora (opcional)
 

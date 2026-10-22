@@ -2,10 +2,10 @@ const crypto = require("crypto");
 const { MongoClient } = require("mongodb");
 
 const EVENTS = [
-  "50-libre", "100-libre", "200-libre",
-  "50-espalda", "100-espalda",
-  "50-pecho", "100-pecho",
-  "50-mariposa", "100-mariposa",
+  "25-libre", "50-libre", "100-libre", "400-libre",
+  "25-mariposa", "50-mariposa",
+  "25-espalda", "50-espalda",
+  "25-pecho", "50-pecho",
   "100-combinado"
 ];
 

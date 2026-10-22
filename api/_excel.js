@@ -4,9 +4,9 @@ const yauzl = require("yauzl");
 const { EVENTS, safeEqual } = require("./_lib");
 
 const MAX_BYTES = 2 * 1024 * 1024;
-const MAX_ROWS = 10000;
+const MAX_ROWS = EVENTS.length * 1000;
 const HEADER = ["Serie", "Carril", "Nadador", "Tiempo", "Acción", "ID", "Prueba", "Original", "Nombre original", "Firma"];
-const LABELS = Object.fromEntries(EVENTS.map(id => [id, id.replace(/^(\d+)-/, "$1 m ")]));
+const LABELS = Object.fromEntries(EVENTS.map(id => [id, id.replace(/^(\d+)-/, "$1 m ").replace(/espalda$/, "dorso")]));
 const FORMAT = "natacion-excel-v1";
 
 function fail(message, status = 400) { const e = new Error(message); e.status = status; throw e; }
@@ -132,7 +132,7 @@ async function readWorkbook(buffer) {
   await checkZip(buffer);
   const book = new ExcelJS.Workbook();
   try { await book.xlsx.load(buffer); } catch { fail("No se pudo abrir el Excel. Usa el archivo .xlsx descargado de esta web, sin contraseña."); }
-  if (book.worksheets.length > 10 || !book.worksheets.length) fail("El archivo debe tener entre 1 y 10 hojas de pruebas.");
+  if (book.worksheets.length > EVENTS.length || !book.worksheets.length) fail("El archivo debe tener entre 1 y " + EVENTS.length + " hojas de pruebas.");
   let count = 0;
   const rows = [], errors = [], sheets = new Set();
   for (const sheet of book.worksheets) {
