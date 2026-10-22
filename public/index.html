@@ -93,7 +93,6 @@ ul.list li:first-child { border-top: 0; }
 .evgrid { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr)); }
 .evgrid section.card { margin: 0; }
 .login { max-width: 420px; }
-.pins { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 14px; }
 .badge { font: 600 .9rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: var(--good); border: 1px solid var(--good); border-radius: 4px; padding: 4px 10px; }
 .excel-scroll { overflow: auto; max-height: 360px; margin: 12px 0; }
 .excel-table { border-collapse: collapse; width: 100%; text-align: left; }
@@ -148,13 +147,11 @@ summary { cursor: pointer; font-weight: 600; }
   function lsSet(k, v) { try { if (v === null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) {} }
 
   var token = ss("swim_token");                      // organizador
-  var me = null;                                     // nadador con sesión: { id, name, token }
-  try { me = JSON.parse(ss("swim_me") || "null"); } catch (e) { me = null; }
   var ready = false, loadError = false, lastJson = "";
   var swimmers = [], times = {}, timeStatuses = {};
   var tab = "inscripcion", evSel = EVENTS[0].id;
-  var formName = "", formPin = "", formPin2 = "", formEvents = {}, editingId = null, formMsg = null, confirmDel = null;
-  var pw = "", loginMsg = "", lname = "", lpin = "", miMsg = "", dirty = false;
+  var formName = "", formEvents = {}, editingId = null, formMsg = null, confirmDel = null;
+  var pw = "", loginMsg = "", dirty = false;
 
   function esc(s) {
     return String(s).replace(/[&<>"']/g, function (c) {
@@ -197,19 +194,16 @@ summary { cursor: pointer; font-weight: 600; }
     opts = opts || {};
     var headers = { "Content-Type": "application/json" };
     if (token) headers["Authorization"] = "Bearer " + token;
-    if (me && me.token) headers["X-Swimmer-Token"] = me.token;
     var r = await fetch(path, { method: opts.method || "GET", headers: headers, body: opts.body ? JSON.stringify(opts.body) : undefined });
     var data = null;
     try { data = await r.json(); } catch (e) {}
     if (!r.ok) { var err = new Error((data && data.error) || "Error"); err.status = r.status; throw err; }
     return data;
   }
-  function logoutAdmin() { token = null; ssSet("swim_token", null); if (window.SwimExcel) SwimExcel.reset(); if (tab === "tiempos") tab = "resultados"; }
-  function logoutMe() { me = null; ssSet("swim_me", null); resetForm(); formMsg = null; }
-  function setMe(v) { me = v; ssSet("swim_me", JSON.stringify(v)); }
+  function logoutAdmin() { token = null; ssSet("swim_token", null); resetForm(); confirmDel = null; formMsg = null; if (window.SwimExcel) SwimExcel.reset(); if (tab === "tiempos") tab = "resultados"; }
   function handleAuthFail(e) {
     if (e && e.status === 401 && token) { logoutAdmin(); loginMsg = "La sesión venció. Entra de nuevo."; tab = "organizador"; return true; }
-    if (e && e.status === 403 && me && !token) { logoutMe(); miMsg = "Tu sesión venció. Entra de nuevo con tu nombre y tu PIN."; tab = "mi"; return true; }
+    if (e && e.status === 403 && token) { logoutAdmin(); loginMsg = "Entra como organizador para modificar inscripciones."; tab = "organizador"; return true; }
     return false;
   }
 
@@ -235,26 +229,13 @@ summary { cursor: pointer; font-weight: 600; }
   /* ---------- vistas ---------- */
   function renderTabs() {
     var tabs = [["inscripcion", "Inscripción"], ["resultados", "Resultados"]];
-    if (!me && !token) tabs.push(["mi", "Mi inscripción"]);
     tabs.push(token ? ["tiempos", "Tiempos"] : ["organizador", "Organizador"]);
     document.getElementById("tabs").innerHTML = tabs.map(function (t) {
       return '<button role="tab" data-act="tab" data-tab="' + t[0] + '" aria-selected="' + (tab === t[0]) + '">' + t[1] + "</button>";
     }).join("");
     var who = "";
     if (token) who = '<span class="badge">Organizador</span> <button class="btn ghost sm" data-act="logout-admin">Salir</button>';
-    else if (me) who = '<span class="badge">' + esc(me.name) + '</span> <button class="btn ghost sm" data-act="logout-me">Salir</button>';
     document.getElementById("who").innerHTML = who;
-  }
-
-  function pinFieldsHtml(required) {
-    var opt = required ? "PIN de 4 números" : "PIN del nadador (opcional)";
-    var opt2 = "Repite el PIN";
-    var note = required ? "Lo vas a necesitar para editar o quitar tu inscripción. Anótalo, no se puede recuperar." : "Si lo dejas vacío, solo tú podrás modificar esta inscripción.";
-    return '<div class="pins"><div><label class="lbl" for="f-pin">' + opt + '</label>' +
-      '<input type="password" id="f-pin" data-field="pin" inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="••••" value="' + esc(formPin) + '"></div>' +
-      '<div><label class="lbl" for="f-pin2">' + opt2 + '</label>' +
-      '<input type="password" id="f-pin2" data-field="pin2" inputmode="numeric" maxlength="4" autocomplete="new-password" placeholder="••••" value="' + esc(formPin2) + '"></div></div>' +
-      '<p class="note" style="margin:6px 0 0">' + note + "</p>";
   }
 
   function viewForm() {
@@ -262,7 +243,7 @@ summary { cursor: pointer; font-weight: 600; }
     var h = '<section class="card"><h2>' + (editingId ? "Editar inscripción" : "Inscríbete") + "</h2>";
     h += '<div><label class="lbl" for="f-name">Nombre del nadador</label>' +
       '<input type="text" id="f-name" data-field="name" autocomplete="off" maxlength="60" placeholder="Nombre y apellido" value="' + esc(formName) + '"></div>';
-    if (!editingId) h += pinFieldsHtml(!token);
+    if (!token) h += '<p class="note">Si te equivocas en tu nombre o tus pruebas, comunícate con el organizador para que lo corrija.</p>';
     h += "<h3>Pruebas que quieres nadar</h3>";
     STROKES.forEach(function (st) {
       h += '<div class="note" style="margin:10px 0 6px;font-weight:600">' + esc(st) + '</div><div class="events">';
@@ -282,12 +263,10 @@ summary { cursor: pointer; font-weight: 600; }
   function viewInscripcion() {
     var h = "";
     var deviceName = ls("swim_registered");
-    if (editingId) h += viewForm();
-    else if (token || (!me && !deviceName)) h += viewForm();
+    if (token || !deviceName) h += viewForm();
     else {
       h += '<section class="card"><h2>Ya estás inscrito</h2>';
-      if (me) h += '<p>Estás inscrito como <strong>' + esc(me.name) + '</strong>. Para cambiar tus pruebas o quitarte, usa los botones junto a tu nombre en la lista.</p>';
-      else h += '<p>Desde este dispositivo ya se inscribió <strong>' + esc(deviceName) + '</strong>. Si eres tú, entra en <em>Mi inscripción</em> con tu nombre y tu PIN. Si necesitas inscribir a otra persona, pídeselo al organizador.</p>';
+      h += '<p>Desde este dispositivo ya se inscribió <strong>' + esc(deviceName) + '</strong>. Si te equivocaste, necesitas cambiar tus pruebas, quitarte o inscribir a otra persona, comunícate con el organizador.</p>';
       if (formMsg) h += '<p class="msg ' + formMsg.kind + '">' + esc(formMsg.text) + "</p>";
       h += "</section>";
     }
@@ -299,7 +278,7 @@ summary { cursor: pointer; font-weight: 600; }
     else {
       h += '<ul class="list">';
       swimmers.forEach(function (s) {
-        var can = !!token || (me && me.id === s.id);
+        var can = !!token;
         h += '<li><div class="who"><strong>' + esc(s.name || "Sin nombre") + "</strong>" + evChips(s.events) + "</div>";
         if (can) {
           h += '<div class="row"><button class="btn ghost sm" data-act="edit" data-id="' + esc(s.id) + '">Editar</button>';
@@ -312,18 +291,6 @@ summary { cursor: pointer; font-weight: 600; }
       h += "</ul>";
     }
     return h + "</section>";
-  }
-
-  function viewMi() {
-    return '<section class="card login"><h2>Mi inscripción</h2>' +
-      '<p class="note" style="margin-top:-4px">Entra con el nombre y el PIN que elegiste al inscribirte para cambiar tus pruebas o quitarte de la lista.</p>' +
-      '<form id="mi-form"><label class="lbl" for="f-lname">Nombre</label>' +
-      '<input type="text" id="f-lname" data-field="lname" autocomplete="off" maxlength="60" value="' + esc(lname) + '">' +
-      '<label class="lbl" for="f-lpin" style="margin-top:12px">PIN</label>' +
-      '<input type="password" id="f-lpin" data-field="lpin" inputmode="numeric" maxlength="4" autocomplete="off" placeholder="••••" value="' + esc(lpin) + '">' +
-      '<div class="row" style="margin-top:14px"><button class="btn" type="submit">Entrar</button></div>' +
-      (miMsg ? '<p class="msg err">' + esc(miMsg) + "</p>" : "") +
-      '<p class="note">Si olvidaste tu PIN, pídele al organizador que te ponga uno nuevo.</p></form></section>';
   }
 
   function viewResultados() {
@@ -384,7 +351,7 @@ summary { cursor: pointer; font-weight: 600; }
     dirty = false;
     var a = document.activeElement, fid = a && a.id ? a.id : null;
     renderTabs();
-    var html = tab === "tiempos" ? viewTiempos() : tab === "resultados" ? viewResultados() : tab === "organizador" ? viewOrganizador() : tab === "mi" && !me && !token ? viewMi() : viewInscripcion();
+    var html = tab === "tiempos" ? viewTiempos() : tab === "resultados" ? viewResultados() : tab === "organizador" ? viewOrganizador() : viewInscripcion();
     document.getElementById("view").innerHTML = html;
     if (fid) { var el = document.getElementById(fid); if (el && el.focus) el.focus(); }
   }
@@ -395,11 +362,12 @@ summary { cursor: pointer; font-weight: 600; }
   }
 
   /* ---------- acciones ---------- */
-  function resetForm() { formName = ""; formPin = ""; formPin2 = ""; formEvents = {}; editingId = null; }
+  function resetForm() { formName = ""; formEvents = {}; editingId = null; }
 
   function startEdit(id) {
+    if (!token) return false;
     var s = swimmers.filter(function (x) { return x.id === id; })[0]; if (!s) return false;
-    editingId = id; formName = s.name || ""; formPin = ""; formPin2 = ""; formEvents = {};
+    editingId = id; formName = s.name || ""; formEvents = {};
     (s.events || []).forEach(function (e) { formEvents[e] = true; });
     formMsg = null; tab = "inscripcion";
     return true;
@@ -408,21 +376,17 @@ summary { cursor: pointer; font-weight: 600; }
   async function saveSwimmer() {
     var name = formName.trim();
     var evs = Object.keys(formEvents).filter(function (k) { return formEvents[k]; });
-    var needPin = !token && !editingId;
     if (name.length < 2) { formMsg = { kind: "err", text: "Escribe el nombre del nadador." }; render(); return; }
-    if ((needPin || formPin || formPin2) && !/^\d{4}$/.test(formPin)) { formMsg = { kind: "err", text: "El PIN debe tener 4 números." }; render(); return; }
-    if ((needPin || formPin || formPin2) && formPin !== formPin2) { formMsg = { kind: "err", text: "Los dos PIN no coinciden." }; render(); return; }
     if (!evs.length) { formMsg = { kind: "err", text: "Elige al menos una prueba." }; render(); return; }
     var btn = document.getElementById("f-save"); if (btn) btn.disabled = true;
     try {
       if (editingId) {
         await api("/api/swimmers?id=" + encodeURIComponent(editingId), { method: "PUT", body: { name: name, events: evs } });
-        if (me && me.id === editingId && !token) setMe({ id: me.id, name: name, token: me.token });
         formMsg = { kind: "ok", text: "Cambios guardados." };
       } else {
-        var r = await api("/api/swimmers", { method: "POST", body: { name: name, events: evs, pin: formPin || undefined } });
-        if (!token && r.token) { setMe({ id: r.id, name: name, token: r.token }); lsSet("swim_registered", name); }
-        formMsg = { kind: "ok", text: name + " quedó inscrito en " + evs.length + (evs.length === 1 ? " prueba." : " pruebas.") };
+        await api("/api/swimmers", { method: "POST", body: { name: name, events: evs } });
+        if (!token) lsSet("swim_registered", name);
+        formMsg = { kind: "ok", text: name + " quedó inscrito en " + evs.length + (evs.length === 1 ? " prueba." : " pruebas.") + (!token ? " Si necesitas una corrección, comunícate con el organizador." : "") };
       }
       resetForm();
       await load();
@@ -434,10 +398,10 @@ summary { cursor: pointer; font-weight: 600; }
   }
 
   async function removeSwimmer(id) {
+    if (!token) return;
     confirmDel = null;
     try {
       await api("/api/swimmers?id=" + encodeURIComponent(id), { method: "DELETE" });
-      if (me && me.id === id && !token) { logoutMe(); lsSet("swim_registered", null); }
       if (editingId === id) resetForm();
       formMsg = { kind: "ok", text: "Nadador quitado de la lista." };
       await load();
@@ -480,22 +444,6 @@ summary { cursor: pointer; font-weight: 600; }
     render();
   }
 
-  async function doMiLogin() {
-    if (lname.trim().length < 2 || !/^\d{4}$/.test(lpin)) { miMsg = "Escribe tu nombre y tu PIN de 4 números."; render(); return; }
-    try {
-      var r = await api("/api/swimmer-login", { method: "POST", body: { name: lname.trim(), pin: lpin } });
-      setMe({ id: r.id, name: r.name, token: r.token });
-      lsSet("swim_registered", r.name);
-      lname = ""; lpin = ""; miMsg = "";
-      await load();
-      if (!startEdit(r.id)) tab = "inscripcion";
-    } catch (e) {
-      miMsg = e.message || "No se pudo entrar."; lpin = "";
-    }
-    render();
-    var f = document.getElementById("f-name"); if (f && editingId) f.scrollIntoView({ block: "center" });
-  }
-
   /* En Excel, un texto que empieza con = + - @ se interpreta como fórmula */
   function csvText(v) { v = String(v); return /^[=+\-@\t\r]/.test(v) ? "'" + v : v; }
   function exportCsv() {
@@ -520,15 +468,14 @@ summary { cursor: pointer; font-weight: 600; }
     var t = ev.target.closest("[data-act]");
     if (!t) return;
     var act = t.getAttribute("data-act"), id = t.getAttribute("data-id");
-    if (act === "tab") { tab = t.getAttribute("data-tab"); loginMsg = ""; miMsg = ""; render(); }
+    if (act === "tab") { tab = t.getAttribute("data-tab"); loginMsg = ""; render(); }
     else if (act === "save") saveSwimmer();
     else if (act === "logout-admin") { logoutAdmin(); render(); }
-    else if (act === "logout-me") { logoutMe(); tab = "inscripcion"; render(); }
     else if (act === "edit") {
       if (startEdit(id)) { render(); var f = document.getElementById("f-name"); if (f) { f.scrollIntoView({ block: "center" }); f.focus(); } }
     }
     else if (act === "cancel-edit") { resetForm(); formMsg = null; render(); }
-    else if (act === "del") { confirmDel = id; render(); }
+    else if (act === "del" && token) { confirmDel = id; render(); }
     else if (act === "del-no") { confirmDel = null; render(); }
     else if (act === "del-yes") removeSwimmer(id);
     else if (act === "pick") { evSel = t.getAttribute("data-ev"); render(); }
@@ -536,22 +483,13 @@ summary { cursor: pointer; font-weight: 600; }
   });
   document.addEventListener("submit", function (ev) {
     if (ev.target.id === "login-form") { ev.preventDefault(); doLogin(); }
-    else if (ev.target.id === "mi-form") { ev.preventDefault(); doMiLogin(); }
   });
   document.addEventListener("input", function (ev) {
     var t = ev.target;
     if (t.getAttribute) {
       var f = t.getAttribute("data-field");
-      if (f === "pin" || f === "pin2" || f === "lpin") {
-        var c = t.value.replace(/\D/g, "").slice(0, 4);
-        if (c !== t.value) t.value = c;
-      }
       if (f === "name") formName = t.value;
-      else if (f === "pin") formPin = t.value;
-      else if (f === "pin2") formPin2 = t.value;
       else if (f === "pw") pw = t.value;
-      else if (f === "lname") lname = t.value;
-      else if (f === "lpin") lpin = t.value;
     }
     if (t.classList && t.classList.contains("tin")) { t.classList.remove("bad"); t.title = ""; }
   });
@@ -563,7 +501,7 @@ summary { cursor: pointer; font-weight: 600; }
   document.addEventListener("keydown", function (ev) {
     if (ev.key !== "Enter" || !ev.target.classList) return;
     if (ev.target.classList.contains("tin")) { ev.preventDefault(); ev.target.blur(); }
-    else if (ev.target.id === "f-name" || ev.target.id === "f-pin" || ev.target.id === "f-pin2") { ev.preventDefault(); saveSwimmer(); }
+    else if (ev.target.id === "f-name") { ev.preventDefault(); saveSwimmer(); }
   });
   document.addEventListener("focusout", function () {
     setTimeout(function () { if (dirty && !isTextInput(document.activeElement)) render(); }, 0);

@@ -7,7 +7,7 @@ module.exports = handler(async (req, res) => {
     db.collection("swimmers").find({}, { projection: { name: 1, events: 1, createdAt: 1 } }).sort({ createdAt: 1 }).toArray(),
     db.collection("times").find({}).toArray()
   ]);
-  // solo campos públicos: nunca el PIN ni datos internos
+  // Solo campos públicos; no se exponen datos internos de registros anteriores.
   send(res, 200, {
     swimmers: swimmers.map((s) => ({ id: String(s._id), name: s.name, events: s.events || [], createdAt: s.createdAt })),
     times: times.map((t) => ({ eventId: t.eventId, swimmerId: t.swimmerId, ms: t.ms, status: t.status === "dns" ? "dns" : "ok" }))

@@ -59,35 +59,6 @@ function isAdmin(req) {
   return safeEqual(sig, sign("a:" + exp));
 }
 
-/* ---------- Sesión de nadador (token firmado, 12 h) ---------- */
-function makeSwimmerToken(id) {
-  const exp = String(Date.now() + 12 * 60 * 60 * 1000);
-  return id + "." + exp + "." + sign("s:" + id + ":" + exp);
-}
-function swimmerIdFromReq(req) {
-  const parts = String(req.headers["x-swimmer-token"] || "").split(".");
-  if (parts.length !== 3) return null;
-  const [id, exp, sig] = parts;
-  if (!/^[a-f0-9]{24}$/.test(id) || !/^\d+$/.test(exp) || Number(exp) < Date.now()) return null;
-  return safeEqual(sig, sign("s:" + id + ":" + exp)) ? id : null;
-}
-
-/* ---------- PIN (se guarda cifrado con scrypt) ---------- */
-const scrypt = (pin, salt) => new Promise((res, rej) => crypto.scrypt(pin, salt, 32, (e, k) => (e ? rej(e) : res(k))));
-async function hashPin(pin) {
-  const salt = crypto.randomBytes(16);
-  const h = await scrypt(pin, salt);
-  return { pinSalt: salt.toString("hex"), pinHash: h.toString("hex") };
-}
-async function verifyPin(pin, doc) {
-  if (!doc || !doc.pinSalt || !doc.pinHash) return false;
-  const h = await scrypt(pin, Buffer.from(doc.pinSalt, "hex"));
-  return crypto.timingSafeEqual(h, Buffer.from(doc.pinHash, "hex"));
-}
-function cleanPin(v) {
-  return typeof v === "string" && /^\d{4}$/.test(v) ? v : null;
-}
-
 /* ---------- Utilidades ---------- */
 function send(res, status, body) {
   res.status(status).setHeader("Cache-Control", "no-store");
@@ -118,6 +89,5 @@ function handler(fn) {
 }
 
 module.exports = {
-  EVENTS, getDb, getClient, makeToken, isAdmin, safeEqual, send, cleanName, nameKey, cleanEvents, handler,
-  makeSwimmerToken, swimmerIdFromReq, hashPin, verifyPin, cleanPin
+  EVENTS, getDb, getClient, makeToken, isAdmin, safeEqual, send, cleanName, nameKey, cleanEvents, handler
 };

@@ -1,5 +1,12 @@
 ACTUALIZAR TU WEB
 
+CAMBIO ACTUAL: SOLO EL ORGANIZADOR CORRIGE INSCRIPCIONES
+Los nadadores se inscriben con nombre y pruebas. Se quitaron los campos de clave, la pestaña de acceso personal y la ruta api/swimmer-login.js.
+Si alguien se equivoca, la página le indica que se comunique con el organizador.
+Solo una sesión válida de organizador permite editar o quitar inscripciones, también desde el servidor. Los accesos antiguos de nadadores ya no sirven para modificar datos.
+Las inscripciones y tiempos existentes se conservan. Excel continúa disponible.
+Al actualizar el repositorio, incluye la eliminación de api/swimmer-login.js.
+
 1. Extrae el ZIP.
 2. Copia el contenido de natacion-vercel a tu carpeta del proyecto o al mismo repositorio de GitHub que ya usa Vercel.
 3. Incluye TODOS los archivos nuevos y modificados. No subas la carpeta contenedora como una subcarpeta si antes api y public estaban en la raíz.

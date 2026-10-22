@@ -4,11 +4,11 @@ Web para inscribir nadadores por prueba y anotar tiempos. Hecha para Vercel con 
 
 ## Cómo funciona
 
-- **Inscribirse:** cada persona escribe su nombre, elige un **PIN de 4 números** y marca sus pruebas. No necesita cuenta.
+- **Inscribirse:** cada persona escribe su nombre y marca sus pruebas. No necesita cuenta ni clave.
 - **Un nombre, una inscripción:** el mismo nombre no se puede inscribir dos veces (no importan mayúsculas ni tildes). Además, desde un mismo dispositivo solo se puede inscribir una persona.
-- **Editar o quitarse:** en **Mi inscripción** se entra con nombre + PIN, desde cualquier dispositivo. Cada quien solo puede tocar la suya.
+- **Corregir o quitar una inscripción:** solo el organizador puede hacerlo. Si alguien se equivoca, debe comunicarse con él. La página muestra ese aviso al inscribirse y si intenta repetir un nombre.
 - **Resultados:** públicos, se actualizan solos cada 8 segundos.
-- **Organizador:** con tu contraseña entras a **Tiempos** para anotar y corregir tiempos, y puedes editar, quitar o inscribir a cualquiera (también ponerle o cambiarle el PIN si lo olvidó).
+- **Organizador:** con tu contraseña entras a **Tiempos** para anotar y corregir tiempos. En **Inscripción** puedes editar, quitar o inscribir a cualquiera. Se conservan la descarga e importación por Excel.
 
 ## 1. Base de datos (MongoDB Atlas, plan gratis)
 
@@ -46,8 +46,8 @@ Si cambias una variable después, hay que volver a desplegar (Deployments → �
 
 ## Prueba antes del evento
 
-1. Abre el enlace e inscribe a alguien de prueba con su PIN.
-2. Cierra la pestaña, entra a **Mi inscripción** con ese nombre y PIN y cambia una prueba.
+1. Abre el enlace e inscribe a alguien de prueba con su nombre y sus pruebas.
+2. Verifica que el público no tenga botones para editar o quitar. Entra como organizador y corrige su inscripción desde **Inscripción**.
 3. Entra a **Organizador**, anota un tiempo y mira que salga en **Resultados**.
 4. Borra la inscripción de prueba.
 
@@ -87,7 +87,7 @@ Después del despliegue haz primero una prueba con una inscripción de prueba: d
 
 ## Verificación del cambio
 
-`npm install` y `npm test` ejecutan las pruebas automatizadas de generación, lectura e importación. Las pruebas usan una base simulada para validar los contratos y las rutas; no sustituyen una prueba contra tu Atlas real. Se verificó también la interfaz en navegador con datos ficticios y la generación/lectura de 10.000 filas (1.000 inscritos en diez pruebas). No se validó el guardado desde una instalación real de Microsoft Excel.
+`npm install` y `npm test` ejecutan las pruebas automatizadas de inscripción, permisos de organizador, generación, lectura e importación de Excel. Las pruebas usan una base simulada para validar los contratos y las rutas; no sustituyen una prueba contra tu Atlas real. La función de Excel se verificó también en navegador con datos ficticios y generando/leyendo 10.000 filas (1.000 inscritos en diez pruebas). No se validó el guardado desde una instalación real de Microsoft Excel.
 
 ## Probar en tu computadora (opcional)
 
@@ -100,13 +100,13 @@ npx vercel dev
 ## Seguridad
 
 - La contraseña de organizador y la conexión a la base de datos viven solo en el servidor (variables de entorno), nunca en la página.
-- Los PIN se guardan cifrados (scrypt). La lista pública nunca los incluye.
-- Tras 5 PIN incorrectos seguidos, ese nombre queda bloqueado 5 minutos. La contraseña de organizador tiene un freno parecido (1 minuto).
-- Las sesiones duran 12 horas y se borran al cerrar la pestaña.
+- No hay acceso de nadadores. El servidor rechaza toda modificación o baja sin una sesión válida de organizador, incluso si alguien conserva un acceso de la versión anterior.
+- La contraseña de organizador tiene un freno básico tras cinco intentos fallidos (1 minuto).
+- La sesión de organizador dura 12 horas y se borra al cerrar la pestaña.
 - El CSV exportado neutraliza nombres que empiecen con `=`, `+`, `-` o `@` para que Excel no los ejecute como fórmulas.
 - No subas `.env.local` a GitHub (ya está en `.gitignore`).
 
 ## Límites
 
-- Un PIN de 4 números es cómodo, no una cerradura fuerte: el bloqueo por intentos evita que lo adivinen, pero no es protección bancaria. Para esto es suficiente.
+- Las inscripciones siguen abiertas al público: el nombre no demuestra la identidad de quien lo escribe. Si alguien registra un nombre ajeno, el organizador debe resolverlo.
 - «Una persona por dispositivo» es una ayuda, no un candado: quien use otro teléfono o borre los datos del navegador puede inscribirse otra vez (con otro nombre). Revisa la lista si te importa.
