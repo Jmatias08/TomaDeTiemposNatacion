@@ -2,7 +2,7 @@
   var hooks, busy = false, message = "";
   function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
   function html() {
-    return '<section class="card download-card"><div><h2>Una copia para llevar</h2><p class="note">Descarga los inscritos y sus resultados, con una hoja por prueba. Los tiempos se guardan aquí, directamente.</p></div><button class="btn ghost" data-excel-action="download"' + (busy ? ' disabled' : '') + '>Descargar Excel</button>' + (message ? '<p role="status" class="note">' + esc(message) + '</p>' : '') + '</section>';
+    return '<section class="card download-card"><button class="btn ghost" data-excel-action="download"' + (busy ? ' disabled' : '') + '>Descargar Excel</button>' + (message ? '<p role="status" class="note">' + esc(message) + '</p>' : '') + '</section>';
   }
   async function download() {
     busy = true; message = 'Preparando el archivo…'; hooks.render();

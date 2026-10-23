@@ -27,7 +27,7 @@
   }
   if (typeof module !== 'undefined' && module.exports) module.exports = { parse: parse, format: format, description: description, preview: preview };
   if (!root.document) return;
-  var hooks, eventId = '', search = '', pendingOnly = false, drafts = {}, messages = {}, saving = {}, confirmation = null;
+  var hooks, eventId = '', drafts = {}, messages = {}, saving = {}, confirmation = null;
   try { drafts = JSON.parse(sessionStorage.getItem('swim_time_drafts') || '{}') || {}; } catch (e) { drafts = {}; }
   if (typeof drafts !== 'object' || Array.isArray(drafts)) drafts = {};
   function persist() { try { sessionStorage.setItem('swim_time_drafts', JSON.stringify(drafts)); } catch (e) {} }
@@ -39,47 +39,35 @@
   function raw(sid) { var k = key(sid), time = hooks.time(eventId, sid); return hasDraft(k) ? drafts[k] : time !== null ? format(time) : ''; }
   function html() {
     if (!eventId) eventId = (hooks.events.filter(function (e) { return hooks.swimmers().some(function (s) { return (s.events || []).indexOf(e.id) >= 0; }); })[0] || hooks.events[0]).id;
-    var all = people(), completed = all.filter(function (s) { return saved(s.id); }).length;
-    var ev = hooks.events.filter(function (e) { return e.id === eventId; })[0];
-    var h = '<section class="capture-head"><div class="capture-eyebrow">ORGANIZADOR</div><h2>Cargar tiempos</h2><p>Elegí una prueba y cargá a quien acaba de nadar. Sin series asignadas ni orden de salida.</p>';
-    h += '<div class="capture-tools"><div><label class="lbl" for="capture-event">Prueba</label><select id="capture-event">';
-    hooks.events.forEach(function (e) { h += '<option value="' + e.id + '"' + (e.id === eventId ? ' selected' : '') + '>' + esc(e.name) + ' · ' + hooks.swimmers().filter(function (s) { return (s.events || []).indexOf(e.id) >= 0; }).length + ' inscritos</option>'; });
-    h += '</select></div><div><label class="lbl" for="capture-search">Buscar nadador</label><input id="capture-search" type="search" placeholder="Escribí su nombre…" value="' + esc(search) + '"></div></div>';
-    h += '<div class="capture-progress"><span><strong>' + completed + '</strong> de ' + all.length + ' registrados</span><label><input id="capture-pending" type="checkbox"' + (pendingOnly ? ' checked' : '') + '> Solo pendientes</label></div>';
-    h += '</section><div class="capture-guide"><span><b>Segundos</b> 32.5 → 32.50 s</span><span><b>Minutos</b> 100.00 → 1:00.00</span><span>También podés escribir 1:05.32</span></div>';
-    var needle = search.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    var list = all.filter(function (s) { return (!pendingOnly || !saved(s.id) || hasDraft(key(s.id))) && s.name.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().indexOf(needle) >= 0; });
+    var list = people().slice();
     list.sort(function (a, b) { return a.name.localeCompare(b.name, 'es') || a.id.localeCompare(b.id); });
-    h += '<div class="capture-list-heading"><h3>' + esc(ev.name) + '</h3><span>' + list.length + ' nadadores a la vista</span></div>';
-    if (!list.length) h += '<div class="empty">' + (!all.length ? 'Todavía no hay inscritos en esta prueba.' : 'No hay nadadores que coincidan con este filtro.') + '</div>';
-    h += '<div class="capture-grid">';
+    var h = '<section class="capture-selector"><label class="lbl" for="capture-event">Prueba</label><select id="capture-event">';
+    hooks.events.forEach(function (e) { h += '<option value="' + e.id + '"' + (e.id === eventId ? ' selected' : '') + '>' + esc(e.name) + '</option>'; });
+    h += '</select></section>';
+    if (!list.length) return h + '<div class="empty">No hay inscritos en esta prueba.</div>';
+    h += '<section class="capture-list"><div class="capture-columns"><span>Nadador</span><span>Tiempo</span><span></span></div><ul class="capture-rows">';
     list.forEach(function (s) {
-      var k = key(s.id), time = hooks.time(eventId, s.id), draft = hasDraft(k), value = raw(s.id), msg = messages[k];
-      h += '<article class="capture-card' + (draft ? ' has-draft' : '') + '"><div class="capture-person"><h4>' + esc(s.name) + '</h4><span class="capture-state' + (saved(s.id) ? ' done' : '') + '">' + (draft ? 'Sin guardar' : time !== null ? 'Registrado' : 'Sin tiempo') + '</span></div>';
-      h += '<div class="capture-current"><span>EN RESULTADOS</span><strong>' + (time !== null ? format(time) : 'Sin tiempo') + '</strong></div>';
-      h += '<label class="lbl" for="capture-' + s.id + '">' + (saved(s.id) ? 'Anotar o corregir tiempo' : 'Tiempo del nadador') + '</label><div class="capture-entry"><input id="capture-' + s.id + '" class="capture-time" data-capture-sid="' + s.id + '" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" placeholder="32.50 / 100.00" value="' + esc(value) + '" aria-describedby="capture-hint-' + s.id + '"' + (saving[k] ? ' disabled' : '') + '><button class="btn" data-capture="save" data-sid="' + s.id + '"' + (saving[k] ? ' disabled' : '') + '>' + (saving[k] ? 'Guardando…' : 'Guardar') + '</button></div>';
-      h += '<p id="capture-hint-' + s.id + '" class="capture-hint">' + esc(preview(value)) + '</p>';
-      h += '<div class="capture-actions">';
-      if (saved(s.id)) h += '<button class="capture-link danger-text" data-capture="clear" data-sid="' + s.id + '"' + (saving[k] ? ' disabled' : '') + '>Borrar resultado</button>';
-      if (draft) h += '<button class="capture-link" data-capture="discard" data-sid="' + s.id + '">Descartar cambio</button>';
-      h += '</div>';
-      if (confirmation && confirmation.key === k) h += '<div class="capture-confirm">¿Borrar este resultado? Quedará sin tiempo.<div class="row"><button class="btn sm" data-capture="confirm" data-sid="' + s.id + '">Confirmar</button><button class="btn ghost sm" data-capture="cancel">Cancelar</button></div></div>';
-      if (msg) h += '<p role="status" class="msg ' + (msg.error ? 'err' : 'ok') + '">' + esc(msg.text) + '</p>';
-      h += '</article>';
+      var k = key(s.id), value = raw(s.id), msg = messages[k];
+      h += '<li class="capture-row' + (hasDraft(k) ? ' has-draft' : '') + '" data-capture-row="' + s.id + '"><strong class="capture-name">' + esc(s.name) + '</strong>';
+      h += '<input id="capture-' + s.id + '" class="capture-time" data-capture-sid="' + s.id + '" type="text" inputmode="decimal" enterkeyhint="done" autocomplete="off" placeholder="Sin tiempo" aria-label="Tiempo de ' + esc(s.name) + '" value="' + esc(value) + '"' + (saving[k] ? ' disabled' : '') + '><button class="btn" data-capture="save" data-sid="' + s.id + '"' + (saving[k] ? ' disabled' : '') + '>' + (saving[k] ? 'Guardando…' : 'Guardar') + '</button>';
+      if (confirmation && confirmation.key === k) h += '<div class="capture-confirm">¿Dejar a ' + esc(s.name) + ' sin tiempo?<div class="row"><button class="btn sm" data-capture="confirm" data-sid="' + s.id + '">Confirmar</button><button class="btn ghost sm" data-capture="cancel">Cancelar</button></div></div>';
+      if (msg) h += '<p role="status" class="capture-message msg ' + (msg.error ? 'err' : 'ok') + '">' + esc(msg.text) + '</p>';
+      h += '</li>';
     });
-    return h + '</div><p class="note capture-foot">Se guarda cada nadador por separado. Si la conexión falla, el tiempo escrito permanece para volver a intentar.</p>';
+    return h + '</ul></section>';
   }
   async function save(sid, action) {
     var selected = eventId, k = key(sid);
     if (saving[k]) return;
     var ms = action === 'save' ? parse(raw(sid)) : null;
-    if (action === 'save' && (ms === null || Number.isNaN(ms))) { messages[k] = { error: true, text: description(ms === null ? NaN : ms) }; hooks.render(); return; }
+    if (action === 'save' && ms === null && saved(sid)) { confirmation = { key: k, action: 'clear' }; hooks.render(); return; }
+    if (action === 'save' && (ms === null || Number.isNaN(ms))) { messages[k] = { error: true, text: 'Tiempo no válido.' }; hooks.render(); return; }
     saving[k] = true; delete messages[k]; confirmation = null; hooks.render();
     try {
       await hooks.api('/api/times', { method: 'PUT', body: { eventId: selected, swimmerId: sid, ms: ms } });
       hooks.saved(selected, sid, ms, ms === null ? null : 'ok');
       delete drafts[k]; persist();
-      messages[k] = { text: action === 'clear' ? 'Resultado borrado. Queda sin tiempo.' : 'Guardado · ' + description(ms) };
+      messages[k] = { text: action === 'clear' ? 'Sin tiempo.' : 'Guardado.' };
     } catch (e) {
       hooks.auth(e);
       messages[k] = { error: true, text: (e.message || 'No se pudo guardar.') + ' El resultado no se confirmó. Revisá la conexión y volvé a intentar.' };
@@ -88,27 +76,23 @@
   document.addEventListener('input', function (ev) {
     var t = ev.target;
     if (!hooks) return;
-    if (t.id === 'capture-search') { search = t.value; hooks.render(); return; }
     if (!t.matches || !t.matches('[data-capture-sid]')) return;
     var sid = t.getAttribute('data-capture-sid'), k = key(sid);
     drafts[k] = t.value; delete messages[k]; persist();
-    var hint = document.getElementById('capture-hint-' + sid); if (hint) hint.textContent = preview(t.value);
-    var card = t.closest('.capture-card'); if (card) { card.classList.add('has-draft'); var state = card.querySelector('.capture-state'); if (state) state.textContent = 'Sin guardar'; }
+    var row = t.closest('.capture-row');
+    if (row) { row.classList.add('has-draft'); var message = row.querySelector('.capture-message'); if (message) message.remove(); }
   });
   document.addEventListener('change', function (ev) {
     if (!hooks) return;
-    if (ev.target.id === 'capture-event') { eventId = ev.target.value; search = ''; confirmation = null; hooks.render(); }
-    if (ev.target.id === 'capture-pending') { pendingOnly = ev.target.checked; hooks.render(); }
+    if (ev.target.id === 'capture-event') { eventId = ev.target.value; confirmation = null; hooks.render(); }
   });
   document.addEventListener('click', function (ev) {
     var button = ev.target.closest('[data-capture]'); if (!button || !hooks) return;
     var action = button.getAttribute('data-capture'), sid = button.getAttribute('data-sid'), k = key(sid);
     if (action === 'save') save(sid, action);
-    else if (action === 'clear') { confirmation = { key: k, action: action }; hooks.render(); }
     else if (action === 'confirm' && confirmation && confirmation.key === k) save(sid, confirmation.action);
     else if (action === 'cancel') { confirmation = null; hooks.render(); }
-    else if (action === 'discard') { delete drafts[k]; delete messages[k]; persist(); hooks.render(); }
   });
   document.addEventListener('keydown', function (ev) { if (ev.key === 'Enter' && ev.target.matches && ev.target.matches('[data-capture-sid]')) { ev.preventDefault(); save(ev.target.getAttribute('data-capture-sid'), 'save'); } });
-  root.SwimCapture = { init: function (value) { hooks = value; }, html: html, reset: function () { confirmation = null; search = ''; messages = {}; } };
+  root.SwimCapture = { init: function (value) { hooks = value; }, html: html, reset: function () { confirmation = null; messages = {}; } };
 })(typeof window === 'undefined' ? globalThis : window);

@@ -1,11 +1,11 @@
 ACTUALIZAR TU WEB
 
 Esta versión permite cargar los tiempos directamente en Organizador → Tiempos:
-elegir prueba → buscar nadador → escribir tiempo → Guardar o Enter.
+elegir prueba → lista de nadadores → escribir tiempo → Guardar o Enter.
 
 No hay un orden de salida ni series asignadas en la página.
 100.00 se interpreta como un minuto. 32.5 se interpreta como 32.50 segundos.
-La vista previa explica los minutos y segundos antes de guardar.
+La pantalla muestra solo los nombres, los campos de tiempo y Guardar.
 Borrar un resultado requiere confirmación. Los nadadores sin un registro quedan sin tiempo.
 
 Excel queda únicamente como descarga de inscritos y resultados.

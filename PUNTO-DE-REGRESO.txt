@@ -8,6 +8,6 @@ Para probar o restaurar esa versión, extraé el ZIP en una carpeta aparte. Cons
 El ZIP es un respaldo del código: no incluye la base de datos ni revierte los tiempos que hayas guardado en MongoDB. Conservá las variables de entorno existentes.
 
 VERSIÓN NUEVA
-Seleccionar prueba → buscar nadador → escribir tiempo → Guardar o Enter.
+Seleccionar prueba → lista de nadadores → escribir tiempo → Guardar o Enter.
 100.00 = 1:00.00; 105.32 = 1:05.32; 32.5 = 32.50 segundos.
 No hay series asignadas en la página. El Excel se descarga con grupos de tres como referencia, sin opción de importarlo.

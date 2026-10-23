@@ -57,11 +57,10 @@ Si cambias una variable después, hay que volver a desplegar (Deployments → �
 
 1. Entrá a **Organizador → Tiempos**.
 2. Elegí la prueba. Se muestran sus inscritos por nombre, sin asignar series ni orden de salida.
-3. Buscá al nadador y escribí su tiempo. La vista previa distingue minutos de segundos.
+3. En la lista de inscritos de esa prueba, escribí el tiempo junto al nombre.
 4. Presioná **Guardar** o **Enter**. El resultado guardado aparece en su tarjeta y en Resultados.
 5. Podés cambiar de prueba y volver: los borradores se conservan en la pestaña y no se pierden al actualizar la lista. Si falla la conexión, no se confirma el guardado y podés volver a intentar.
-6. Si no hay un tiempo registrado, queda **sin tiempo**. Para quitar uno existente, usá **Borrar resultado** y confirmá. Vaciar el campo nunca borra por sí solo un resultado.
-7. El filtro **Solo pendientes** sirve para encontrar a quienes todavía no tienen resultado.
+6. Si no hay un tiempo registrado, queda **sin tiempo**. Para quitar uno existente, vaciá su campo, presioná **Guardar** y confirmá. Vaciar el campo por sí solo no borra un resultado.
 
 Formatos de entrada:
 - `32.5` o `32,5` = 32.50 segundos.
