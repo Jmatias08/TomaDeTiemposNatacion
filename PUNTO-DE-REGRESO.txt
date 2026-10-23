@@ -1,0 +1,13 @@
+BASE ANTES DEL REDISEÑO DE CARGA DIRECTA (22 de octubre de 2026)
+
+Se guardó el código de la versión anterior en natacion-base-2026-10-22.zip, entregado en esta conversación.
+La versión corresponde al commit cbdad1507b31ee4be8caf375ee8ef98c47ce1482 del repositorio.
+
+Para probar o restaurar esa versión, extraé el ZIP en una carpeta aparte. Conservá los cambios actuales antes de reemplazar archivos. Para publicar la versión anterior, usá su código en el repositorio conectado con Vercel.
+
+El ZIP es un respaldo del código: no incluye la base de datos ni revierte los tiempos que hayas guardado en MongoDB. Conservá las variables de entorno existentes.
+
+VERSIÓN NUEVA
+Seleccionar prueba → buscar nadador → escribir tiempo → Guardar o Enter.
+100.00 = 1:00.00; 105.32 = 1:05.32; 32.5 = 32.50 segundos.
+No hay series asignadas en la página. El Excel se descarga con grupos de tres como referencia, sin opción de importarlo.

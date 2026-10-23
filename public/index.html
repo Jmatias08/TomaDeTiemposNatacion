@@ -94,17 +94,60 @@ ul.list li:first-child { border-top: 0; }
 .evgrid section.card { margin: 0; }
 .login { max-width: 420px; }
 .badge { font: 600 .9rem var(--font-display); letter-spacing: .08em; text-transform: uppercase; color: var(--good); border: 1px solid var(--good); border-radius: 4px; padding: 4px 10px; }
-.excel-scroll { overflow: auto; max-height: 360px; margin: 12px 0; }
-.excel-table { border-collapse: collapse; width: 100%; text-align: left; }
-.excel-table th, .excel-table td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
-.excel-table th { position: sticky; top: 0; background: var(--surface); }
-.excel-table caption { text-align: left; color: var(--muted); }
-.excel-issues { max-height: 250px; overflow: auto; padding-left: 24px; }
-#excel-file { max-width: 100%; }
 details { margin: 12px 0; }
 summary { cursor: pointer; font-weight: 600; }
 @media (max-width: 480px) { h1 { font-size: 2.1rem; } section.card { padding: 16px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+.capture-head { background: #123e50; color: #fff; padding: 26px; border-radius: 16px; margin-bottom: 14px; }
+.capture-eyebrow { color: #86d9e7; font: 600 .85rem var(--font-data); letter-spacing: .12em; }
+.capture-head h2 { font-size: 2.2rem; margin: 8px 0; text-transform: none; letter-spacing: 0; }
+.capture-head p { color: #c3dce5; margin: 0 0 22px; }
+.capture-tools { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.capture-tools select, .capture-tools input { width: 100%; min-height: 48px; padding: 10px 12px; border-radius: 7px; border: 1px solid #a9cbd6; color: #102c39; background: #fff; font: 500 1rem var(--font-body); }
+.capture-progress { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-top: 18px; flex-wrap: wrap; color: #d8edf2; }
+.capture-progress strong { color: #fff; font-size: 1.3rem; }
+.capture-progress label { display: flex; gap: 8px; align-items: center; cursor: pointer; }
+.capture-progress input { width: 18px; height: 18px; accent-color: #6ad5e9; }
+.capture-guide { display: flex; gap: 10px 24px; flex-wrap: wrap; border: 1px solid var(--line); padding: 14px 18px; border-radius: 10px; font-size: .92rem; background: var(--surface); }
+.capture-guide b { margin-right: 5px; color: var(--accent); }
+.capture-list-heading { display: flex; justify-content: space-between; align-items: center; margin: 24px 0 12px; gap: 12px; color: var(--muted); font-size: .9rem; }
+.capture-list-heading h3 { margin: 0; font-size: 1.35rem; color: var(--ink); }
+.capture-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+.capture-card { padding: 20px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); min-width: 0; }
+.capture-card.has-draft { border-color: #d1a347; }
+.capture-person { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+.capture-person h4 { margin: 0; font: 600 1.15rem var(--font-body); overflow-wrap: anywhere; }
+.capture-state { white-space: nowrap; color: var(--muted); background: var(--bg); border-radius: 20px; font-size: .74rem; padding: 3px 9px; }
+.capture-state.done { color: var(--good); background: var(--accent-soft); }
+.capture-current { display: flex; align-items: center; justify-content: space-between; margin: 22px 0 20px; gap: 12px; }
+.capture-current span { color: var(--muted); font-size: .7rem; letter-spacing: .08em; }
+.capture-current strong { font: 500 1.7rem var(--font-data); }
+.capture-card .lbl { font-size: .85rem; }
+.capture-entry { display: flex; gap: 8px; align-items: stretch; }
+.capture-entry input.capture-time { min-width: 0; font: 500 1.45rem var(--font-data); padding: 12px; width: 100%; letter-spacing: -.03em; }
+.capture-entry .btn { padding: 10px 16px; border-radius: 6px; font-size: 1rem; letter-spacing: .02em; }
+.capture-hint { font: 500 .85rem var(--font-data); color: var(--muted); min-height: 2.8em; margin: 10px 0 2px; }
+.capture-actions { display: flex; flex-wrap: wrap; gap: 8px 16px; }
+.capture-link { cursor: pointer; padding: 6px 0; border: 0; background: none; color: var(--accent); font: 500 .85rem var(--font-body); text-decoration: underline; text-underline-offset: 3px; }
+.danger-text { color: var(--danger); }
+.capture-confirm { margin-top: 12px; border-top: 1px solid var(--line); padding-top: 12px; font-size: .9rem; }
+.capture-confirm .row { margin-top: 8px; }
+.capture-foot { margin: 18px 0 24px; }
+section.download-card { border-radius: 12px; display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.download-card > div { flex: 1 1 300px; }
+.download-card h2 { font-size: 1.25rem; text-transform: none; margin: 0; }
+.download-card p { margin: 6px 0 0; }
+@media (max-width: 600px) {
+  .capture-head { padding: 20px; }
+  .capture-head h2 { font-size: 1.8rem; }
+  .capture-tools, .capture-grid { grid-template-columns: 1fr; }
+  .capture-person h4 { font-size: 1.15rem; }
+  .capture-card { padding: 18px; }
+  .capture-guide { gap: 6px; flex-direction: column; }
+  .download-card .btn { width: 100%; }
+}
+
 </style>
 </head>
 <body>
@@ -122,6 +165,7 @@ summary { cursor: pointer; font-weight: 600; }
 </div>
 
 <script src="/excel.js"></script>
+<script src="/capture.js"></script>
 <script>
 (function () {
   var EVENTS = [
@@ -159,16 +203,6 @@ summary { cursor: pointer; font-weight: 600; }
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
-  function parseTime(s) {
-    s = String(s).trim().replace(",", ".");
-    if (!s) return null;
-    var m = s.match(/^(?:(\d+):)?(\d{1,2})(?:\.(\d{1,2}))?$/);
-    if (!m) return NaN;
-    var min = +(m[1] || 0), sec = +m[2], cs = m[3] ? +(m[3] + "0").slice(0, 2) : 0;
-    if (m[1] && sec >= 60) return NaN;
-    var ms = (min * 60 + sec) * 1000 + cs * 10;
-    return ms > 0 ? ms : NaN;
-  }
   function fmt(ms) {
     var t = Math.round(ms / 10), cs = t % 100, s = Math.floor(t / 100) % 60, m = Math.floor(t / 6000);
     return (m ? m + ":" + String(s).padStart(2, "0") : String(s)) + "." + String(cs).padStart(2, "0");
@@ -201,7 +235,7 @@ summary { cursor: pointer; font-weight: 600; }
     if (!r.ok) { var err = new Error((data && data.error) || "Error"); err.status = r.status; throw err; }
     return data;
   }
-  function logoutAdmin() { token = null; ssSet("swim_token", null); resetForm(); confirmDel = null; formMsg = null; if (window.SwimExcel) SwimExcel.reset(); if (tab === "tiempos") tab = "resultados"; }
+  function logoutAdmin() { token = null; ssSet("swim_token", null); resetForm(); confirmDel = null; formMsg = null; if (window.SwimExcel) SwimExcel.reset(); if (window.SwimCapture) SwimCapture.reset(); if (tab === "tiempos") tab = "resultados"; }
   function handleAuthFail(e) {
     if (e && e.status === 401 && token) { logoutAdmin(); loginMsg = "La sesión venció. Entra de nuevo."; tab = "organizador"; return true; }
     if (e && e.status === 403 && token) { logoutAdmin(); loginMsg = "Entra como organizador para modificar inscripciones."; tab = "organizador"; return true; }
@@ -306,7 +340,7 @@ summary { cursor: pointer; font-weight: 600; }
         var p;
         if (r.ms !== null) { pos++; p = '<span class="pos p' + pos + '">' + pos + "</span>"; } else p = '<span class="pos">–</span>';
         h += "<li>" + p + '<div class="who"><strong>' + esc(r.s.name || "Sin nombre") + "</strong></div>" +
-          (r.ms !== null ? '<span class="time">' + fmt(r.ms) + "</span>" : '<span class="time none">' + (timeStatuses[e.id + "__" + r.s.id] === "dns" ? "no nadó" : "sin tiempo") + '</span>') + "</li>";
+          (r.ms !== null ? '<span class="time">' + fmt(r.ms) + "</span>" : '<span class="time none">sin tiempo</span>') + "</li>";
       });
       h += "</ul></section>";
     });
@@ -325,27 +359,7 @@ summary { cursor: pointer; font-weight: 600; }
   function viewTiempos() {
     if (!token) return viewOrganizador();
     if (!ready) return '<div class="empty">Cargando inscritos…</div>';
-    var h = (window.SwimExcel ? SwimExcel.html() : '') + '<div class="picker" role="group" aria-label="Prueba">';
-    EVENTS.forEach(function (e) {
-      h += '<button class="pick" data-act="pick" data-ev="' + e.id + '" aria-pressed="' + (evSel === e.id) + '">' + esc(e.name) + "<small>" + swimmersIn(e.id).length + "</small></button>";
-    });
-    h += "</div>";
-    var ev = evById[evSel], list = ranked(evSel);
-    h += '<section class="card"><h2>' + esc(ev.name) + "</h2>";
-    h += '<p class="note" style="margin-top:-4px">Escribe el tiempo como 32.45 o 1:05.32 y presiona Enter. Para borrar un tiempo, vacía el campo.</p>';
-    if (!list.length) h += '<div class="empty">Nadie se ha inscrito en esta prueba.</div>';
-    else {
-      h += '<ul class="list">';
-      list.forEach(function (r) {
-        h += '<li style="align-items:center"><div class="who"><strong>' + esc(r.s.name || "Sin nombre") + '</strong>' + (timeStatuses[evSel + "__" + r.s.id] === "dns" ? '<small class="note"> · no nadó</small>' : '') + '</div>' +
-          '<input class="tin" type="text" inputmode="decimal" autocomplete="off" id="t-' + esc(r.s.id) + '" data-sid="' + esc(r.s.id) + '" aria-label="Tiempo de ' + esc(r.s.name || "nadador") + '" placeholder="0.00" value="' + (r.ms !== null ? fmt(r.ms) : "") + '"></li>';
-      });
-      h += "</ul>";
-    }
-    h += "</section>";
-    h += '<section class="card"><h2>Exportar</h2><p class="note" style="margin-top:-4px">Descarga todas las pruebas con su clasificación en un archivo CSV que abre Excel.</p>' +
-      '<div class="row"><button class="btn" data-act="csv">Descargar resultados</button></div></section>';
-    return h;
+    return (loadError ? '<p class="msg err">No se pudo actualizar la lista. Revisá la conexión antes de guardar.</p>' : '') + SwimCapture.html() + SwimExcel.html();
   }
 
   function render() {
@@ -413,26 +427,6 @@ summary { cursor: pointer; font-weight: 600; }
     render();
   }
 
-  async function saveTime(input) {
-    var sid = input.getAttribute("data-sid"), val = parseTime(input.value);
-    var prev = timeOf(evSel, sid);
-    if (Number.isNaN(val)) { input.classList.add("bad"); input.title = "Formato no válido. Usa 32.45 o 1:05.32"; return; }
-    input.classList.remove("bad"); input.title = "";
-    if (val === prev && timeStatuses[evSel + "__" + sid] !== "dns") return;
-    try {
-      await api("/api/times", { method: "PUT", body: { eventId: evSel, swimmerId: sid, ms: val } });
-      var k = evSel + "__" + sid;
-      if (val === null) { delete times[k]; delete timeStatuses[k]; } else { times[k] = val; timeStatuses[k] = "ok"; }
-      if (val !== null) input.value = fmt(val);
-      input.classList.add("saved");
-      setTimeout(function () { input.classList.remove("saved"); }, 1200);
-      lastJson = "";
-    } catch (e) {
-      if (handleAuthFail(e)) { render(); return; }
-      input.classList.add("bad"); input.title = e.message || "No se pudo guardar este tiempo";
-    }
-  }
-
   async function doLogin() {
     if (!pw) { loginMsg = "Escribe la contraseña."; render(); return; }
     try {
@@ -454,7 +448,7 @@ summary { cursor: pointer; font-weight: 600; }
       var pos = 0;
       ranked(e.id).forEach(function (r) {
         var p = ""; if (r.ms !== null) { pos++; p = pos; }
-        rows.push([q(csvText(e.name)), q(p), q(csvText(r.s.name || "")), q(r.ms !== null ? fmt(r.ms) : timeStatuses[e.id + "__" + r.s.id] === "dns" ? "No nadó" : "")].join(","));
+        rows.push([q(csvText(e.name)), q(p), q(csvText(r.s.name || "")), q(r.ms !== null ? fmt(r.ms) : "")].join(","));
       });
     });
     var blob = new Blob(["﻿" + rows.join("\r\n")], { type: "text/csv;charset=utf-8" });
@@ -497,18 +491,26 @@ summary { cursor: pointer; font-weight: 600; }
   document.addEventListener("change", function (ev) {
     var t = ev.target;
     if (t.getAttribute && t.getAttribute("data-ev") && t.type === "checkbox") { formEvents[t.getAttribute("data-ev")] = t.checked; formMsg = null; render(); }
-    else if (t.classList && t.classList.contains("tin")) saveTime(t);
   });
   document.addEventListener("keydown", function (ev) {
     if (ev.key !== "Enter" || !ev.target.classList) return;
-    if (ev.target.classList.contains("tin")) { ev.preventDefault(); ev.target.blur(); }
-    else if (ev.target.id === "f-name") { ev.preventDefault(); saveSwimmer(); }
+    if (ev.target.id === "f-name") { ev.preventDefault(); saveSwimmer(); }
   });
   document.addEventListener("focusout", function () {
     setTimeout(function () { if (dirty && !isTextInput(document.activeElement)) render(); }, 0);
   });
 
   /* ---------- arranque: carga y actualización cada 8 s ---------- */
+  SwimCapture.init({
+    events: EVENTS, swimmers: function () { return swimmers; }, time: timeOf,
+    api: api, auth: handleAuthFail, render: render,
+    saved: function (ev, sid, ms, status) {
+      var k = ev + "__" + sid;
+      if (status === null) { delete times[k]; delete timeStatuses[k]; }
+      else { times[k] = ms; timeStatuses[k] = status; }
+      lastJson = "";
+    }
+  });
   if (window.SwimExcel) SwimExcel.init({ token: function () { return token; }, api: api, auth: handleAuthFail, render: requestRender, load: load });
   render();
   load();

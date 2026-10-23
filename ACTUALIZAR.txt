@@ -1,50 +1,27 @@
 ACTUALIZAR TU WEB
 
-PRUEBAS ACTUALES (11)
-25, 50, 100 y 400 m libre; 25 y 50 m mariposa; 25 y 50 m dorso; 25 y 50 m pecho; 100 m combinado.
-Después de publicar este cambio, descarga un Excel nuevo. Los archivos de las pruebas anteriores pueden incluir hojas que ya no están disponibles.
+Esta versión permite cargar los tiempos directamente en Organizador → Tiempos:
+elegir prueba → buscar nadador → escribir tiempo → Guardar o Enter.
 
-CAMBIO ACTUAL: SOLO EL ORGANIZADOR CORRIGE INSCRIPCIONES
-Los nadadores se inscriben con nombre y pruebas. Se quitaron los campos de clave, la pestaña de acceso personal y la ruta api/swimmer-login.js.
-Si alguien se equivoca, la página le indica que se comunique con el organizador.
-Solo una sesión válida de organizador permite editar o quitar inscripciones, también desde el servidor. Los accesos antiguos de nadadores ya no sirven para modificar datos.
-Las inscripciones y tiempos existentes se conservan. Excel continúa disponible.
-Al actualizar el repositorio, incluye la eliminación de api/swimmer-login.js.
+No hay un orden de salida ni series asignadas en la página.
+100.00 se interpreta como un minuto. 32.5 se interpreta como 32.50 segundos.
+La vista previa explica los minutos y segundos antes de guardar.
+Borrar un resultado requiere confirmación. Los nadadores sin un registro quedan sin tiempo.
 
-1. Extrae el ZIP.
-2. Copia el contenido de natacion-vercel a tu carpeta del proyecto o al mismo repositorio de GitHub que ya usa Vercel.
-3. Incluye TODOS los archivos nuevos y modificados. No subas la carpeta contenedora como una subcarpeta si antes api y public estaban en la raíz.
-4. Publica los cambios en GitHub y espera el despliegue automático de Vercel.
-5. Conserva tus variables de Vercel. MONGODB_DB debe seguir siendo TomaDeTiempos. No borres datos de MongoDB.
-6. Entra como organizador, abre Tiempos y busca Tiempos desde Excel.
+Excel queda únicamente como descarga de inscritos y resultados.
+Los grupos del archivo son de tres y sirven solo como referencia para imprimir.
+La ruta de importación de Excel se retiró del servidor.
 
-ARCHIVOS NUEVOS
-api/_excel.js
-api/excel.js
-public/excel.js
-test/excel.test.js
-test/helpers.js
-ACTUALIZAR.txt
+Subí TODOS los cambios al mismo repositorio de GitHub conectado con Vercel.
+Incluí el archivo nuevo public/capture.js, package.json y package-lock.json.
+Conservá tus variables de Vercel, especialmente MONGODB_DB=TomaDeTiempos.
+No borres inscripciones ni tiempos de MongoDB.
 
-ARCHIVOS MODIFICADOS
-api/_lib.js
-api/data.js
-api/times.js
-public/index.html
-package.json
-package-lock.json
-vercel.json
-README.md
-.env.example (solo ejemplo, no reemplaza las variables de Vercel)
+RESPALDO
+El archivo natacion-base-2026-10-22.zip contiene el código anterior al rediseño.
+Conservá ese ZIP; permite volver a la versión previa.
+Ver PUNTO-DE-REGRESO.txt. El respaldo de código no revierte datos de MongoDB.
 
-USO
-Descargar Excel por series → llenar tiempos → guardar como .xlsx → seleccionar archivo → revisar → confirmar y publicar.
-Hay una pestaña por prueba y cuatro nadadores por serie. Puedes imprimir las hojas.
-Tiempo vacío conserva el resultado. Para borrar, vacía Tiempo y elige BORRAR en Acción. Para una ausencia, vacía Tiempo y elige NO NADÓ.
-Puedes subir avances parciales y repetir archivos sin duplicar tiempos. Los errores bloquean el lote completo.
-Conserva el mismo archivo durante la jornada. Una nueva descarga usa la lista actual y puede redistribuir las series.
-
-EDICIONES DIRECTAS CON CODEX
-Abre en Codex la carpeta del proyecto que utilizas para subir a GitHub y continúa la conversación dentro de esa carpeta. Así se editan los archivos de trabajo directamente.
-Si lo único que tienes es el ZIP, puedes extraer este proyecto y usar esa carpeta como tu carpeta de trabajo.
-Editar archivos locales no publica automáticamente en Vercel: los cambios deben llegar al repositorio conectado.
+PRUEBAS ANTES DEL EVENTO
+Comprobá en la web desplegada un tiempo de segundos (32.5), uno de minutos
+(100.00), una corrección y la descarga de Excel.

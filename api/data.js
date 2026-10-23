@@ -10,6 +10,6 @@ module.exports = handler(async (req, res) => {
   // Solo campos públicos; no se exponen datos internos de registros anteriores.
   send(res, 200, {
     swimmers: swimmers.map((s) => ({ id: String(s._id), name: s.name, events: s.events || [], createdAt: s.createdAt })),
-    times: times.map((t) => ({ eventId: t.eventId, swimmerId: t.swimmerId, ms: t.ms, status: t.status === "dns" ? "dns" : "ok" }))
+    times: times.map((t) => ({ eventId: t.eventId, swimmerId: t.swimmerId, ms: Number.isInteger(t.ms) ? t.ms : null }))
   });
 });

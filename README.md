@@ -53,45 +53,41 @@ Si cambias una variable después, hay que volver a desplegar (Deployments → �
 3. Entra a **Organizador**, anota un tiempo y mira que salga en **Resultados**.
 4. Borra la inscripción de prueba.
 
-## Excel por series (nuevo)
+## Cargar tiempos directamente
 
-1. Entra a **Organizador → Tiempos → Descargar Excel por series**.
-2. Recibirás un solo archivo `.xlsx`, con una pestaña para cada una de las once pruebas. Los inscritos se ordenan por fecha de inscripción y se reparten en series de cuatro, carriles 1 a 4. El último grupo puede tener menos de cuatro nadadores. No hay siembra por tiempos, categoría ni sexo.
-3. Puedes ajustar **Serie** y **Carril** dentro del archivo antes de imprimirlo o usarlo. No asignes dos nadadores al mismo carril de la misma serie. Las series son una organización del archivo; no cambian las inscripciones en la web.
-4. Llena **Tiempo** como texto: `32.45`, `32,45` o `1:05.32`. Las celdas ya tienen formato Texto. No uses fórmulas, fechas ni formatos compactos como `3245`. El archivo incluye los tiempos que ya existen para que puedas corregirlos.
-5. Dejar Tiempo y Acción vacíos **conserva el resultado existente**. Para borrar, vacía Tiempo y escribe `BORRAR` en Acción. Para registrar una ausencia, vacía Tiempo y elige `NO NADÓ`. Ese estado aparece en Resultados y en el CSV.
-6. Guarda en formato `.xlsx`. En la web elige **Seleccionar archivo → Revisar archivo**. Se muestra cada cambio con el valor actual y el propuesto, más errores y avisos. Todavía no se escribe nada en la base.
-7. Corrige todos los errores antes de confirmar. Si vuelves a editar el Excel, guárdalo y usa **Cambiar archivo** para seleccionar la versión actualizada. La revisión conserva una copia de lo seleccionado, no observa los cambios del archivo en tu computadora.
-8. Presiona **Confirmar y publicar**. Puedes subir avances parciales o repetir una carga sin duplicar resultados. Después de confirmar, verifica **Resultados**.
+1. Entrá a **Organizador → Tiempos**.
+2. Elegí la prueba. Se muestran sus inscritos por nombre, sin asignar series ni orden de salida.
+3. Buscá al nadador y escribí su tiempo. La vista previa distingue minutos de segundos.
+4. Presioná **Guardar** o **Enter**. El resultado guardado aparece en su tarjeta y en Resultados.
+5. Podés cambiar de prueba y volver: los borradores se conservan en la pestaña y no se pierden al actualizar la lista. Si falla la conexión, no se confirma el guardado y podés volver a intentar.
+6. Si no hay un tiempo registrado, queda **sin tiempo**. Para quitar uno existente, usá **Borrar resultado** y confirmá. Vaciar el campo nunca borra por sí solo un resultado.
+7. El filtro **Solo pendientes** sirve para encontrar a quienes todavía no tienen resultado.
 
-### Precauciones que resuelve la importación
+Formatos de entrada:
+- `32.5` o `32,5` = 32.50 segundos.
+- `100.00` = 1:00.00, un minuto.
+- `105.32` = 1:05.32.
+- `1:05.32` también funciona.
+- En el formato compacto, las últimas dos cifras antes del punto son segundos. `160.00` es inválido porque tiene 60 segundos; usá `200.00` para dos minutos.
+- Un tiempo debe ser mayor que cero y menor de una hora.
 
-- Cada fila tiene identificadores ocultos y firmados. Los nombres se editan en la web, no en Excel. Un nombre cambiado en Excel, un identificador alterado o una ordenación parcial que cambie nombres se rechazan. Si ordenas, selecciona siempre las filas completas, incluyendo las columnas ocultas; el filtro abarca todas las columnas.
-- Una copia vieja no sobrescribe silenciosamente resultados que cambiaron después de descargarla. Las filas intactas se omiten y los conflictos se muestran como errores. Para una nueva corrección después de publicar, descarga un Excel actualizado. El mismo archivo sigue sirviendo para cargar las filas que aún están pendientes.
-- Las filas duplicadas, carriles repetidos, formatos inválidos y tiempos para nadadores retirados o pruebas que ya no nadan bloquean todo el lote. Nadadores nuevos que no aparecen generan un aviso y sus datos se conservan.
-- Puedes cargar solo algunas pestañas si conservan su estructura original. No agregues columnas, encabezados, hojas de notas ni filas manuales. Para incluir un nuevo nadador, inscríbelo en la web y descarga otro archivo.
-- Se permiten archivos de hasta **2 MB**, once hojas y 1.000 filas de nadadores por hoja. Los archivos cifrados, macros, vínculos externos, objetos incrustados y contenidos descomprimidos excesivos se rechazan.
-- Las revisiones vencen a los **15 minutos** y se comprueban nuevamente al confirmar. El servidor usa una transacción de MongoDB para que un error no deje la mitad del lote guardada. Esto requiere MongoDB Atlas o un replica set, no un MongoDB local independiente.
-- Si pierdes conexión al confirmar, el resultado puede haberse guardado. Vuelve a revisar el mismo archivo: los datos ya aplicados se omiten y no se duplican.
-- Los archivos están vinculados al secreto de este despliegue. Si cambias `SESSION_SECRET` (o la contraseña cuando se usa como secreto), descarga archivos nuevos.
+## Descargar Excel
 
-### Mantener las series durante el evento
+Solo hay descarga: **Descargar Excel** genera una hoja por prueba con inscritos, tiempos y estados actuales. El archivo incluye grupos de **tres** como referencia para imprimir; no impone un orden de nado en la página. No se acepta subir archivos y el servidor rechaza la antigua ruta de importación.
 
-Descarga cuando la lista esté lista y conserva el mismo archivo durante la jornada. Una nueva descarga se genera con la lista actual: si alguien se retira o se inscribe, las series pueden cambiar. Esta versión no cierra automáticamente las inscripciones ni almacena series en la base. Coordina el cierre con los participantes y revisa los avisos si trabajas con una lista anterior.
+Las pruebas vigentes son las once indicadas arriba. Los identificadores de dorso conservan la palabra interna `espalda` para mantener asociados los datos existentes. No se reasignan registros de distancias anteriores.
 
-Después del cambio a las once pruebas, descarga un Excel nuevo. Las antiguas pruebas de 200 libre y 100 espalda, pecho y mariposa ya no se ofrecen ni se reasignan automáticamente a otras distancias. Los datos existentes permanecen en la base, pero no se muestran en las pruebas actuales; al editar una inscripción solo se seleccionan pruebas vigentes. Dorso conserva los identificadores internos `25-espalda` y `50-espalda`; el nombre visible es dorso.
+## Punto de regreso
 
-## Actualizar una web ya desplegada
+Antes de este rediseño se guardó una copia completa del código en **natacion-base-2026-10-22.zip**. El archivo se entregó en esta conversación; conservá una copia. Para volver, extraelo en una carpeta aparte y restaurá el código del proyecto desde allí. No hace falta modificar la base de datos para cambiar de versión. El respaldo de código no revierte ni contiene los tiempos de MongoDB.
 
-Sube los archivos de esta carpeta al mismo repositorio conectado con Vercel. Incluye `package.json` y `package-lock.json`: agregan las bibliotecas para Excel. No subas `node_modules`, archivos `.env` ni el ZIP dentro del repositorio.
+## Actualizar Vercel
 
-Conserva tus variables de entorno existentes, especialmente `MONGODB_DB=TomaDeTiempos`. No hacen falta variables nuevas ni borrar colecciones. Vercel instalará las dependencias y redesplegará. Si configuraste manualmente un Install Command, debe instalar las dependencias del `package.json` actualizado. `vercel.json` permite hasta 60 segundos para la función de Excel.
+Subí los cambios al mismo repositorio conectado a Vercel. Incluí el archivo nuevo `public/capture.js`, `package.json` y `package-lock.json`. No hacen falta variables nuevas: conservá `MONGODB_DB=TomaDeTiempos` y las demás variables existentes.
 
-Después del despliegue haz primero una prueba con una inscripción de prueba: descarga, anota un tiempo, revisa, confirma y verifica Resultados. Comprueba también una segunda carga del mismo archivo, una corrección con un archivo nuevo y la opción NO NADÓ. Guarda una copia de tus resultados antes de una importación importante.
+## Verificación
 
-## Verificación del cambio
-
-`npm install` y `npm test` ejecutan las pruebas automatizadas de inscripción, permisos de organizador, generación, lectura e importación de Excel. Las pruebas usan una base simulada para validar los contratos y las rutas; no sustituyen una prueba contra tu Atlas real. La función de Excel se verificó también en navegador con datos ficticios y generando/leyendo 11.000 filas (1.000 inscritos en once pruebas). No se validó el guardado desde una instalación real de Microsoft Excel.
+`npm test` comprueba la descarga de Excel, los permisos de inscripción, el guardado directo y la interpretación de minutos y segundos con datos simulados. Antes del evento comprobá un guardado en tu despliegue real. No se accedió a Atlas para este rediseño.
 
 ## Probar en tu computadora (opcional)
 

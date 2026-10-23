@@ -7,7 +7,10 @@ function memoryDb(initial = fixtures()) {
   let store = initial, failWrites = false, beforeTransaction = null;
   const key = x => x.eventId + ":" + x.swimmerId;
   const db = { collection(name) { return {
-    find() { return { async toArray() { return store[name].map(x => ({ ...x })); } }; },
+    find() { return { sort() { return this; }, async toArray() { return store[name].map(x => ({ ...x })); } }; },
+    async findOne(query) { return store[name].find(row => Object.entries(query).every(([k,v]) => String(row[k]) === String(v))) || null; },
+    async updateOne(query, update) { const index = store[name].findIndex(row => Object.entries(query).every(([k,v]) => String(row[k]) === String(v))); if (index >= 0) Object.assign(store[name][index], update.$set); else store[name].push({ ...query, ...update.$set }); },
+    async deleteOne(query) { const index = store[name].findIndex(row => Object.entries(query).every(([k,v]) => String(row[k]) === String(v))); if (index >= 0) store[name].splice(index,1); },
     async updateMany(filter, update) { store.swimmers.forEach(s => { if (filter._id.$in.some(id => String(id) === String(s._id))) s.excelRevision = (s.excelRevision || 0) + update.$inc.excelRevision; }); },
     async bulkWrite(ops) {
       for (let i = 0; i < ops.length; i++) {

@@ -5,7 +5,8 @@ module.exports = handler(async (req, res) => {
   if (req.method !== "PUT") return send(res, 405, { error: "Método no permitido" });
   if (!isAdmin(req)) return send(res, 401, { error: "Necesitas la contraseña de organizador" });
 
-  const { eventId, swimmerId, ms } = req.body || {};
+  const { eventId, swimmerId, ms, status } = req.body || {};
+  if (status !== undefined && status !== "ok") return send(res, 400, { error: "Estado no válido. Guarda un tiempo o deja el resultado sin tiempo." });
   if (!EVENTS.includes(eventId)) return send(res, 400, { error: "Prueba no válida" });
   if (typeof swimmerId !== "string" || !ObjectId.isValid(swimmerId)) return send(res, 400, { error: "Nadador no válido" });
 
